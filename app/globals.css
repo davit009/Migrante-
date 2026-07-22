@@ -5,8 +5,9 @@
 @import "shadcn/tailwind.css";
 
 /* ============================================================
-   Migrante$ — Design System
-   Inspirado en: Apple, Notion, Mercado Pago, BBVA, Material 3
+   Migrante$ — Liquid Glass Design System v2.0
+   Estética: iOS 26 / visionOS / Glassmorphism Minimalista
+   Paleta: Azul Marino institucional con neutros cálidos
    ============================================================ */
 
 @custom-variant dark (&:is(.dark *));
@@ -50,150 +51,164 @@
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
 
-  /* Colores de marca Migrante$ */
   --color-brand: var(--brand);
-  --color-brand-foreground: var(--brand-foreground);
   --color-success: var(--success);
-  --color-success-foreground: var(--success-foreground);
   --color-warning: var(--warning);
-  --color-warning-foreground: var(--warning-foreground);
 
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: calc(var(--radius) * 0.8);
+  --radius-sm: calc(var(--radius) * 0.5);
+  --radius-md: calc(var(--radius) * 0.75);
   --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.4);
-  --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
-  --radius-4xl: calc(var(--radius) * 2.6);
+  --radius-xl: calc(var(--radius) * 1.33);
+  --radius-2xl: calc(var(--radius) * 1.67);
+  --radius-3xl: calc(var(--radius) * 2);
 }
 
 /* ─── Modo Claro ─────────────────────────────────────────── */
 :root {
-  /* shadcn base tokens — Migrante$ azul institucional */
-  --background: oklch(0.985 0 0);
-  --foreground: oklch(0.145 0 0);
+  /* Fondo: blanco cálido ligeramente azulado */
+  --background: oklch(0.97 0.005 250);
+  --foreground: oklch(0.13 0.015 255);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
+  --card-foreground: oklch(0.13 0.015 255);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
+  --popover-foreground: oklch(0.13 0.015 255);
 
-  /* Primary — Azul marino */
-  --primary: oklch(0.38 0.15 255);
-  --primary-foreground: oklch(0.985 0 0);
+  /* Primary — Azul marino institucional */
+  --primary: oklch(0.37 0.16 258);
+  --primary-foreground: oklch(0.98 0 0);
 
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.94 0.02 255);
-  --accent-foreground: oklch(0.38 0.15 255);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.38 0.15 255);
+  --secondary: oklch(0.95 0.008 258);
+  --secondary-foreground: oklch(0.25 0.02 255);
+  --muted: oklch(0.94 0.006 258);
+  --muted-foreground: oklch(0.52 0.015 255);
+  --accent: oklch(0.93 0.015 258);
+  --accent-foreground: oklch(0.37 0.16 258);
+  --destructive: oklch(0.57 0.24 27);
+  --border: oklch(0.90 0.008 258);
+  --input: oklch(0.90 0.008 258);
+  --ring: oklch(0.37 0.16 258);
 
-  /* Charts */
-  --chart-1: oklch(0.52 0.18 255);
+  --chart-1: oklch(0.52 0.18 258);
   --chart-2: oklch(0.60 0.18 145);
   --chart-3: oklch(0.72 0.15 60);
   --chart-4: oklch(0.58 0.20 30);
   --chart-5: oklch(0.55 0.20 320);
 
-  /* Sidebar */
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.38 0.15 255);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.94 0.02 255);
-  --sidebar-accent-foreground: oklch(0.38 0.15 255);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.38 0.15 255);
+  --sidebar: oklch(0.97 0.005 250);
+  --sidebar-foreground: oklch(0.13 0.015 255);
+  --sidebar-primary: oklch(0.37 0.16 258);
+  --sidebar-primary-foreground: oklch(0.98 0 0);
+  --sidebar-accent: oklch(0.93 0.015 258);
+  --sidebar-accent-foreground: oklch(0.37 0.16 258);
+  --sidebar-border: oklch(0.90 0.008 258);
+  --sidebar-ring: oklch(0.37 0.16 258);
 
-  /* Migrante$ custom tokens */
-  --brand: oklch(0.52 0.18 255);
-  --brand-foreground: oklch(1 0 0);
-  --success: oklch(0.56 0.17 145);
-  --success-foreground: oklch(1 0 0);
+  --brand: oklch(0.52 0.18 258);
+  --success: oklch(0.54 0.17 145);
   --warning: oklch(0.65 0.16 55);
-  --warning-foreground: oklch(0.145 0 0);
 
-  --radius: 0.75rem;
+  --radius: 1.25rem;
+
+  /* Glass Tokens — Modo Claro */
+  --glass-bg: rgb(255 255 255 / 0.55);
+  --glass-bg-strong: rgb(255 255 255 / 0.75);
+  --glass-border: rgb(255 255 255 / 0.70);
+  --glass-border-subtle: rgb(200 215 255 / 0.40);
+  --glass-blur: 20px;
+  --glass-shadow: 0 4px 24px rgb(30 60 130 / 0.08), 0 1px 2px rgb(30 60 130 / 0.06), inset 0 1px 0 rgb(255 255 255 / 0.90);
+  --glass-shadow-lg: 0 8px 40px rgb(30 60 130 / 0.12), 0 2px 4px rgb(30 60 130 / 0.06), inset 0 1px 0 rgb(255 255 255 / 0.90);
+
+  /* Blob Colors */
+  --blob-1: 195 220 255;
+  --blob-2: 180 205 255;
+  --blob-3: 210 228 255;
 }
 
 /* ─── Modo Oscuro ────────────────────────────────────────── */
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
+  --background: oklch(0.12 0.015 258);
+  --foreground: oklch(0.96 0.005 258);
+  --card: oklch(0.18 0.018 258);
+  --card-foreground: oklch(0.96 0.005 258);
+  --popover: oklch(0.18 0.018 258);
+  --popover-foreground: oklch(0.96 0.005 258);
 
-  --primary: oklch(0.65 0.18 255);
-  --primary-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.68 0.17 258);
+  --primary-foreground: oklch(0.12 0.015 258);
 
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.25 0.04 255);
-  --accent-foreground: oklch(0.75 0.14 255);
-  --destructive: oklch(0.704 0.191 22.216);
+  --secondary: oklch(0.22 0.020 258);
+  --secondary-foreground: oklch(0.96 0.005 258);
+  --muted: oklch(0.22 0.020 258);
+  --muted-foreground: oklch(0.63 0.018 258);
+  --accent: oklch(0.24 0.030 258);
+  --accent-foreground: oklch(0.78 0.15 258);
+  --destructive: oklch(0.68 0.18 22);
   --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.65 0.18 255);
+  --input: oklch(1 0 0 / 12%);
+  --ring: oklch(0.68 0.17 258);
 
-  --chart-1: oklch(0.65 0.18 255);
+  --chart-1: oklch(0.65 0.18 258);
   --chart-2: oklch(0.65 0.18 145);
   --chart-3: oklch(0.78 0.15 65);
   --chart-4: oklch(0.68 0.19 30);
   --chart-5: oklch(0.65 0.19 320);
 
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.65 0.18 255);
-  --sidebar-primary-foreground: oklch(0.145 0 0);
-  --sidebar-accent: oklch(0.22 0.03 255);
-  --sidebar-accent-foreground: oklch(0.75 0.14 255);
+  --sidebar: oklch(0.18 0.018 258);
+  --sidebar-foreground: oklch(0.96 0.005 258);
+  --sidebar-primary: oklch(0.68 0.17 258);
+  --sidebar-primary-foreground: oklch(0.12 0.015 258);
+  --sidebar-accent: oklch(0.24 0.030 258);
+  --sidebar-accent-foreground: oklch(0.78 0.15 258);
   --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.65 0.18 255);
+  --sidebar-ring: oklch(0.68 0.17 258);
 
-  --brand: oklch(0.65 0.18 255);
-  --brand-foreground: oklch(0.145 0 0);
+  --brand: oklch(0.68 0.17 258);
   --success: oklch(0.62 0.17 145);
-  --success-foreground: oklch(0.145 0 0);
   --warning: oklch(0.75 0.16 65);
-  --warning-foreground: oklch(0.145 0 0);
+
+  /* Glass Tokens — Modo Oscuro */
+  --glass-bg: rgb(20 30 70 / 0.45);
+  --glass-bg-strong: rgb(20 30 70 / 0.70);
+  --glass-border: rgb(100 140 255 / 0.18);
+  --glass-border-subtle: rgb(100 140 255 / 0.10);
+  --glass-blur: 24px;
+  --glass-shadow: 0 4px 24px rgb(0 0 0 / 0.30), 0 1px 2px rgb(0 0 0 / 0.20), inset 0 1px 0 rgb(255 255 255 / 0.06);
+  --glass-shadow-lg: 0 8px 40px rgb(0 0 0 / 0.40), 0 2px 4px rgb(0 0 0 / 0.20), inset 0 1px 0 rgb(255 255 255 / 0.06);
+
+  /* Blob Colors dark */
+  --blob-1: 20 40 100;
+  --blob-2: 15 30 90;
+  --blob-3: 25 45 110;
 }
 
-/* ─── Estilos base ───────────────────────────────────────── */
+/* ─── Estilos Base ───────────────────────────────────────── */
 @layer base {
   * {
     @apply border-border outline-ring/50;
-  }
-
-  body {
-    @apply bg-background text-foreground;
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+    -webkit-tap-highlight-color: transparent;
   }
 
   html {
     scroll-behavior: smooth;
-    -webkit-tap-highlight-color: transparent;
+    /* Prevenir zoom en inputs en iOS */
+    -webkit-text-size-adjust: 100%;
   }
 
-  /* Números financieros con tabular nums */
-  .tabular {
-    font-variant-numeric: tabular-nums;
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-inter), system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+    /* Padding inferior para el Bottom Tab Bar */
+    padding-bottom: env(safe-area-inset-bottom);
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-semibold tracking-tight;
+    font-weight: 700;
+    letter-spacing: -0.025em;
   }
 
-  /* Ocultar flechas de inputs number */
   input[type="number"]::-webkit-outer-spin-button,
   input[type="number"]::-webkit-inner-spin-button {
     -webkit-appearance: none;
@@ -202,68 +217,240 @@
   input[type="number"] {
     -moz-appearance: textfield;
   }
+
+  /* Altura táctil mínima de 44px para elementos interactivos (WCAG / Apple HIG) */
+  button, [role="button"], a {
+    min-height: 44px;
+  }
+
+  /* Excepción para botones badge y chips muy pequeños */
+  .btn-xs {
+    min-height: unset;
+  }
 }
 
-/* ─── Utilidades custom ──────────────────────────────────── */
+/* ─── Fondo Global Animado (Blobs) ───────────────────────── */
+@layer base {
+  .bg-canvas {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
+    background: var(--background);
+  }
+
+  .blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.55;
+  }
+
+  .dark .blob {
+    opacity: 0.40;
+  }
+
+  .blob-1 {
+    width: min(500px, 70vw);
+    height: min(500px, 70vw);
+    top: -15%;
+    right: -10%;
+    background: rgb(var(--blob-1) / 0.8);
+    animation: blob-drift-1 18s ease-in-out infinite alternate;
+  }
+
+  .blob-2 {
+    width: min(400px, 55vw);
+    height: min(400px, 55vw);
+    bottom: 5%;
+    left: -8%;
+    background: rgb(var(--blob-2) / 0.7);
+    animation: blob-drift-2 22s ease-in-out infinite alternate;
+  }
+
+  .blob-3 {
+    width: min(350px, 50vw);
+    height: min(350px, 50vw);
+    top: 45%;
+    left: 35%;
+    background: rgb(var(--blob-3) / 0.6);
+    animation: blob-drift-3 15s ease-in-out infinite alternate;
+  }
+
+  @keyframes blob-drift-1 {
+    0% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(-30px, 20px) scale(1.05); }
+    100% { transform: translate(20px, -25px) scale(0.97); }
+  }
+
+  @keyframes blob-drift-2 {
+    0% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(25px, -18px) scale(1.04); }
+    100% { transform: translate(-15px, 22px) scale(0.98); }
+  }
+
+  @keyframes blob-drift-3 {
+    0% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(18px, 15px) scale(1.06); }
+    100% { transform: translate(-20px, -12px) scale(0.96); }
+  }
+}
+
+/* ─── Utilidades Liquid Glass ─────────────────────────────── */
 @layer utilities {
-  /* Glassmorphism card */
-  .glass-card {
-    background: rgb(255 255 255 / 0.8);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgb(0 0 0 / 0.08);
+  /* Glass Card — contenedor base */
+  .glass {
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
   }
 
-  .dark .glass-card {
-    background: rgb(20 24 45 / 0.85);
-    border: 1px solid rgb(255 255 255 / 0.08);
+  /* Glass Card fuerte (formularios, modales) */
+  .glass-strong {
+    background: var(--glass-bg-strong);
+    backdrop-filter: blur(calc(var(--glass-blur) * 1.5));
+    -webkit-backdrop-filter: blur(calc(var(--glass-blur) * 1.5));
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow-lg);
   }
 
-  /* Gradiente de marca */
-  .gradient-brand {
-    background: linear-gradient(135deg, oklch(0.45 0.18 255), oklch(0.55 0.20 280));
+  /* Glass Nav Bar */
+  .glass-nav {
+    background: var(--glass-bg-strong);
+    backdrop-filter: blur(32px) saturate(1.4);
+    -webkit-backdrop-filter: blur(32px) saturate(1.4);
+    border-top: 1px solid var(--glass-border);
+    box-shadow: 0 -4px 24px rgb(30 60 130 / 0.06), inset 0 1px 0 var(--glass-border);
   }
 
-  /* Card con hover premium */
-  .card-hover {
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  .dark .glass-nav {
+    box-shadow: 0 -4px 24px rgb(0 0 0 / 0.3), inset 0 1px 0 var(--glass-border);
   }
-  .card-hover:hover {
+
+  /* Efecto hover de glass */
+  .glass-hover {
+    transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  .glass-hover:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgb(0 0 0 / 0.12);
+    box-shadow: var(--glass-shadow-lg);
   }
 
-  /* Colores de estado financiero */
-  .text-income {
-    color: var(--success);
+  .glass-hover:active {
+    transform: translateY(0px) scale(0.98);
   }
 
-  .text-expense {
-    color: var(--destructive);
+  /* Pill glassmorphism para indicadores activos */
+  .glass-pill-active {
+    background: var(--glass-bg-strong);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
   }
 
-  /* Número financiero */
+  /* Gradiente de marca (botones primarios) */
+  .gradient-primary {
+    background: linear-gradient(
+      135deg,
+      oklch(0.40 0.18 258) 0%,
+      oklch(0.32 0.16 268) 100%
+    );
+  }
+
+  .dark .gradient-primary {
+    background: linear-gradient(
+      135deg,
+      oklch(0.65 0.17 258) 0%,
+      oklch(0.58 0.15 268) 100%
+    );
+  }
+
+  /* Badge de estado financiero */
+  .badge-income {
+    background: rgb(34 197 94 / 0.12);
+    color: oklch(0.48 0.17 145);
+    border: 1px solid rgb(34 197 94 / 0.20);
+  }
+
+  .dark .badge-income {
+    background: rgb(34 197 94 / 0.15);
+    color: oklch(0.68 0.17 145);
+    border: 1px solid rgb(34 197 94 / 0.25);
+  }
+
+  .badge-expense {
+    background: rgb(239 68 68 / 0.10);
+    color: oklch(0.52 0.22 27);
+    border: 1px solid rgb(239 68 68 / 0.18);
+  }
+
+  .dark .badge-expense {
+    background: rgb(239 68 68 / 0.15);
+    color: oklch(0.70 0.20 22);
+    border: 1px solid rgb(239 68 68 / 0.25);
+  }
+
+  /* Número financiero grande */
   .finance-number {
     font-variant-numeric: tabular-nums;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.03em;
+    font-feature-settings: "tnum";
   }
 
-  /* Animación suave de carga */
+  /* Scroll fluido sin scrollbar en contenedores horizontales */
+  .scroll-smooth-x {
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .scroll-smooth-x::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Ocultar scrollbar vertical */
+  .scrollbar-hide {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Animación de pulse suave */
   .pulse-soft {
-    animation: pulse-soft 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    animation: pulse-soft 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   }
 
   @keyframes pulse-soft {
     0%, 100% { opacity: 1; }
-    50% { opacity: 0.5; }
+    50% { opacity: 0.55; }
   }
 
-  /* Ocultar scrollbar */
-  .scrollbar-hide {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
+  /* Entrada de elementos (fade + slide) */
+  .enter-up {
+    animation: enter-up 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
   }
-  .scrollbar-hide::-webkit-scrollbar {
-    display: none;
+
+  @keyframes enter-up {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Safe area padding para el Bottom Tab Bar */
+  .pb-safe {
+    padding-bottom: calc(80px + env(safe-area-inset-bottom));
   }
 }

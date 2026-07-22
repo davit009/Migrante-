@@ -2,24 +2,24 @@
 
 // ============================================================
 // features/auth/components/RegisterForm.tsx
-// Formulario de Registro validado con Zod + RHF
+// Formulario de Registro — Liquid Glass Mobile-First
 // ============================================================
 
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
 import { registerSchema, type RegisterFormValues } from '@/validators/auth.schema';
 import { useAuth } from '../hooks/useAuth';
-import { GoogleButton } from './GoogleButton';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
+
+const inputClass =
+  'h-12 rounded-2xl glass border-0 bg-transparent text-sm focus-visible:ring-1 focus-visible:ring-primary/30';
 
 export function RegisterForm() {
   const [isLoading, setIsLoading] = useState(false);
@@ -44,7 +44,7 @@ export function RegisterForm() {
     try {
       setIsLoading(true);
       await registerWithEmail(values);
-      toast.success('¡Cuenta creada con éxito! Bienvenido a Migrante$');
+      toast.success('¡Cuenta creada! Bienvenido a Migrante$');
       router.push('/dashboard');
       router.refresh();
     } catch (error) {
@@ -54,92 +54,87 @@ export function RegisterForm() {
   };
 
   return (
-    <div className="space-y-6">
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        {/* Nombre */}
-        <div className="space-y-2">
-          <Label htmlFor="nombre">Nombre completo</Label>
-          <Input
-            id="nombre"
-            type="text"
-            placeholder="Juan Pérez"
-            disabled={isLoading}
-            className="h-11 rounded-xl"
-            {...register('nombre')}
-          />
-          {errors.nombre && (
-            <p className="text-xs text-destructive">{errors.nombre.message}</p>
-          )}
-        </div>
-
-        {/* Email */}
-        <div className="space-y-2">
-          <Label htmlFor="email">Correo electrónico</Label>
-          <Input
-            id="email"
-            type="email"
-            placeholder="tu@correo.com"
-            disabled={isLoading}
-            className="h-11 rounded-xl"
-            {...register('email')}
-          />
-          {errors.email && (
-            <p className="text-xs text-destructive">{errors.email.message}</p>
-          )}
-        </div>
-
-        {/* Password */}
-        <div className="space-y-2">
-          <Label htmlFor="password">Contraseña</Label>
-          <Input
-            id="password"
-            type="password"
-            placeholder="Mínimo 8 caracteres, 1 mayúscula y 1 número"
-            disabled={isLoading}
-            className="h-11 rounded-xl"
-            {...register('password')}
-          />
-          {errors.password && (
-            <p className="text-xs text-destructive">{errors.password.message}</p>
-          )}
-        </div>
-
-        {/* Confirm Password */}
-        <div className="space-y-2">
-          <Label htmlFor="confirmPassword">Confirmar contraseña</Label>
-          <Input
-            id="confirmPassword"
-            type="password"
-            placeholder="Repite tu contraseña"
-            disabled={isLoading}
-            className="h-11 rounded-xl"
-            {...register('confirmPassword')}
-          />
-          {errors.confirmPassword && (
-            <p className="text-xs text-destructive">{errors.confirmPassword.message}</p>
-          )}
-        </div>
-
-        {/* Submit */}
-        <Button
-          type="submit"
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      {/* Nombre */}
+      <div className="space-y-1.5">
+        <Label htmlFor="nombre" className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+          Nombre completo
+        </Label>
+        <Input
+          id="nombre"
+          type="text"
+          placeholder="Juan Pérez"
           disabled={isLoading}
-          className="w-full h-11 rounded-xl font-medium text-base shadow-sm"
-        >
-          {isLoading ? 'Creando cuenta...' : 'Crear Cuenta'}
-        </Button>
-      </form>
+          className={inputClass}
+          {...register('nombre')}
+        />
+        {errors.nombre && (
+          <p className="text-xs text-destructive">{errors.nombre.message}</p>
+        )}
+      </div>
 
-      {/* Login Link */}
-      <p className="text-center text-sm text-muted-foreground pt-2">
-        ¿Ya tienes una cuenta?{' '}
-        <Link
-          href="/login"
-          className="font-medium text-primary hover:underline transition-all"
-        >
-          Inicia sesión
-        </Link>
-      </p>
-    </div>
+      {/* Email */}
+      <div className="space-y-1.5">
+        <Label htmlFor="reg-email" className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+          Correo electrónico
+        </Label>
+        <Input
+          id="reg-email"
+          type="email"
+          placeholder="tu@correo.com"
+          disabled={isLoading}
+          className={inputClass}
+          {...register('email')}
+        />
+        {errors.email && (
+          <p className="text-xs text-destructive">{errors.email.message}</p>
+        )}
+      </div>
+
+      {/* Password */}
+      <div className="space-y-1.5">
+        <Label htmlFor="reg-password" className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+          Contraseña
+        </Label>
+        <Input
+          id="reg-password"
+          type="password"
+          placeholder="Mín. 8 caracteres, 1 mayúscula, 1 número"
+          disabled={isLoading}
+          className={inputClass}
+          {...register('password')}
+        />
+        {errors.password && (
+          <p className="text-xs text-destructive">{errors.password.message}</p>
+        )}
+      </div>
+
+      {/* Confirm Password */}
+      <div className="space-y-1.5">
+        <Label htmlFor="confirmPassword" className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+          Confirmar contraseña
+        </Label>
+        <Input
+          id="confirmPassword"
+          type="password"
+          placeholder="Repite tu contraseña"
+          disabled={isLoading}
+          className={inputClass}
+          {...register('confirmPassword')}
+        />
+        {errors.confirmPassword && (
+          <p className="text-xs text-destructive">{errors.confirmPassword.message}</p>
+        )}
+      </div>
+
+      {/* Submit */}
+      <Button
+        type="submit"
+        disabled={isLoading}
+        className="w-full h-12 rounded-2xl font-semibold text-sm gradient-primary border-0 shadow-none active:scale-[0.98] transition-transform mt-2"
+      >
+        {isLoading ? 'Creando cuenta...' : 'Crear cuenta gratis →'}
+      </Button>
+    </form>
   );
 }

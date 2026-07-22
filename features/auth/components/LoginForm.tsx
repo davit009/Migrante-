@@ -60,7 +60,7 @@ export function LoginForm() {
             type="email"
             placeholder="tu@correo.com"
             disabled={isLoading}
-            className="h-11 rounded-xl"
+            className="h-12 rounded-2xl glass border-0 bg-transparent text-sm focus-visible:ring-1 focus-visible:ring-primary/30"
             {...register('email')}
           />
           {errors.email && (
@@ -78,7 +78,7 @@ export function LoginForm() {
             type="password"
             placeholder="••••••••"
             disabled={isLoading}
-            className="h-11 rounded-xl"
+            className="h-12 rounded-2xl glass border-0 bg-transparent text-sm focus-visible:ring-1 focus-visible:ring-primary/30"
             {...register('password')}
           />
           {errors.password && (
@@ -90,22 +90,13 @@ export function LoginForm() {
         <Button
           type="submit"
           disabled={isLoading}
-          className="w-full h-11 rounded-xl font-medium text-base shadow-sm"
+          className="w-full h-12 rounded-2xl font-semibold text-sm gradient-primary border-0 shadow-none active:scale-[0.98] transition-transform"
         >
-          {isLoading ? 'Ingresando...' : 'Iniciar Sesión'}
+          {isLoading ? 'Ingresando...' : 'Iniciar sesión →'}
         </Button>
       </form>
 
-      {/* Register Link */}
-      <p className="text-center text-sm text-muted-foreground pt-2">
-        ¿No tienes una cuenta?{' '}
-        <Link
-          href="/register"
-          className="font-medium text-primary hover:underline transition-all"
-        >
-          Regístrate gratis
-        </Link>
-      </p>
+
     </div>
   );
 }
