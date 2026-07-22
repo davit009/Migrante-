@@ -1,8 +1,8 @@
 'use client';
 
 // ============================================================
-// app/(dashboard)/page.tsx
-// Dashboard Principal — Liquid Glass Mobile-First
+// app/(dashboard)/dashboard/page.tsx
+// Página principal del Dashboard Autenticado (/dashboard)
 // ============================================================
 
 import Link from 'next/link';

@@ -2,10 +2,10 @@
 
 // ============================================================
 // app/(dashboard)/calculator/page.tsx
-// Módulo interactivo de Calculadora de Compras + Impuestos USA
+// Calculadora de Compras Rápida — Liquid Glass Mobile-First
 // ============================================================
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { StateSelectorUsa } from '@/features/calculator/components/StateSelectorUsa';
 import { CalculatorSummary } from '@/features/calculator/components/CalculatorSummary';
 import { calculateSalesTax } from '@/utils/tax.utils';
@@ -13,13 +13,11 @@ import { convertUSDtoMXN } from '@/utils/currency.utils';
 import { useExchangeRate } from '@/features/converter/hooks/useExchangeRate';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { purchaseService } from '@/features/calculator/services/purchase.service';
-import { USA_TAX_RATES } from '@/constants/usa-states';
 
-import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { Plus, Trash2, BookmarkPlus, ShoppingBag } from 'lucide-react';
+import { Plus, Trash2, BookmarkPlus, ShoppingBag, Settings2, ChevronDown, ChevronUp } from 'lucide-react';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 
@@ -32,87 +30,89 @@ interface Item {
 
 export default function CalculatorPage() {
   const { rate } = useExchangeRate();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, profile } = useAuth();
   const router = useRouter();
 
+  // Estado por defecto desde perfil o 'TX'
   const [selectedState, setSelectedState] = useState<string>('TX');
-  const [items, setItems] = useState<Item[]>([
-    { id: '1', nombre: 'Supermercado / Víveres', precio: 45.50, cantidad: 1 },
-    { id: '2', nombre: 'Ropa / Zapatos', precio: 89.99, cantidad: 1 },
-  ]);
+  const [showStateSelector, setShowStateSelector] = useState(false);
 
-  // Formulario temporal de nuevo producto
-  const [newNombre, setNewNombre] = useState('');
+  // Lista de productos vacía por defecto
+  const [items, setItems] = useState<Item[]>([]);
+
+  // Formulario rápido (precio primero)
   const [newPrecio, setNewPrecio] = useState('');
+  const [newNombre, setNewNombre] = useState('');
   const [newCantidad, setNewCantidad] = useState('1');
   const [isSaving, setIsSaving] = useState(false);
 
-  // Cálculos matemáticos de la lista
+  useEffect(() => {
+    if (profile?.estado_usa) {
+      setSelectedState(profile.estado_usa);
+    }
+  }, [profile?.estado_usa]);
+
+  // Cálculos de la lista
   const subtotal = items.reduce((sum, item) => sum + item.precio * item.cantidad, 0);
   const taxInfo = calculateSalesTax(subtotal, selectedState);
   const totalUSD = taxInfo.total;
   const totalMXN = convertUSDtoMXN(totalUSD, rate || 17.5);
 
-  // Agregar producto
+  // Agregar producto (Nombre opcional)
   const handleAddItem = (e: React.FormEvent) => {
     e.preventDefault();
     const precio = parseFloat(newPrecio);
     const cantidad = parseInt(newCantidad) || 1;
 
-    if (!newNombre.trim()) {
-      toast.error('Escribe el nombre del producto');
-      return;
-    }
     if (isNaN(precio) || precio <= 0) {
-      toast.error('Ingresa un precio mayor a 0');
+      toast.error('Ingresa un precio válido mayor a $0');
       return;
     }
+
+    // Si el usuario no ingresa nombre, asignar "Producto #1", "Producto #2"...
+    const nombreFinal = newNombre.trim() || `Producto #${items.length + 1}`;
 
     setItems((prev) => [
       ...prev,
       {
         id: Date.now().toString(),
-        nombre: newNombre.trim(),
+        nombre: nombreFinal,
         precio,
         cantidad,
       },
     ]);
 
-    setNewNombre('');
     setNewPrecio('');
+    setNewNombre('');
     setNewCantidad('1');
   };
 
-  // Eliminar producto
   const removeItem = (id: string) => {
     setItems((prev) => prev.filter((i) => i.id !== id));
   };
 
-  // Vaciar lista
   const clearList = () => {
     setItems([]);
   };
 
-  // Guardar lista en Supabase
   const handleSaveList = async () => {
     if (!isAuthenticated) {
-      toast.info('Inicia sesión para guardar tus listas de compras', {
+      toast.info('Crea tu cuenta para guardar tu lista de compras', {
         action: {
-          label: 'Iniciar sesión',
-          onClick: () => router.push('/login'),
+          label: 'Registrarse',
+          onClick: () => router.push('/register'),
         },
       });
       return;
     }
 
     if (items.length === 0) {
-      toast.error('Agrega al menos un producto a la lista');
+      toast.error('Agrega al menos un precio a la lista');
       return;
     }
 
     try {
       setIsSaving(true);
-      const stateObj = USA_TAX_RATES[selectedState];
       await purchaseService.savePurchaseList({
         estado_usa: selectedState,
         subtotal: taxInfo.subtotal,
@@ -128,7 +128,7 @@ export default function CalculatorPage() {
         })),
       });
 
-      toast.success('Lista de compras guardada exitosamente');
+      toast.success('Lista de compras guardada en tu historial');
       router.push('/history');
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Error al guardar la lista');
@@ -138,144 +138,179 @@ export default function CalculatorPage() {
   };
 
   return (
-    <div className="space-y-8 max-w-4xl mx-auto py-2">
-      {/* Header del Módulo */}
-      <div>
-        <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground flex items-center gap-2.5">
-          <ShoppingBag className="w-7 h-7 text-primary" />
-          Calculadora de Compras
-        </h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          Suma tus productos, calcula los impuestos por estado de EE.UU. y obtén el costo final en dólares y pesos.
-        </p>
+    <div className="space-y-6 max-w-2xl mx-auto pb-4">
+      {/* Header */}
+      <div className="flex items-center justify-between enter-up">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-foreground flex items-center gap-2">
+            <ShoppingBag className="w-6 h-6 text-primary" />
+            Compras
+          </h1>
+          <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
+            Suma tus gastos de compras rápidamente
+          </p>
+        </div>
+
+        {/* Toggle para ajustar Estado de impuesto si se desea */}
+        <button
+          type="button"
+          onClick={() => setShowStateSelector(!showStateSelector)}
+          className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground glass rounded-2xl px-3 py-1.5 btn-xs"
+        >
+          <Settings2 className="w-3.5 h-3.5" />
+          <span>Tax ({selectedState})</span>
+          {showStateSelector ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+        </button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        {/* Columna Izquierda: Formulario e Items (7 Cols) */}
-        <div className="lg:col-span-7 space-y-6">
-          {/* Selector de Estado */}
-          <Card className="p-5 rounded-3xl border-border bg-card shadow-sm">
-            <StateSelectorUsa
-              selectedState={selectedState}
-              onStateChange={setSelectedState}
-            />
-          </Card>
+      {/* Selector de Estado (Oculto por defecto) */}
+      {showStateSelector && (
+        <div className="glass rounded-3xl p-4 enter-up">
+          <StateSelectorUsa
+            selectedState={selectedState}
+            onStateChange={setSelectedState}
+          />
+        </div>
+      )}
 
-          {/* Formulario de Agregar Producto */}
-          <Card className="p-5 rounded-3xl border-border bg-card shadow-sm space-y-4">
-            <h3 className="font-bold text-sm text-foreground">Agregar Producto a la Lista</h3>
-            <form onSubmit={handleAddItem} className="space-y-3">
-              <div className="space-y-1">
-                <Label htmlFor="prod-nombre" className="text-xs">Nombre del producto</Label>
-                <Input
-                  id="prod-nombre"
-                  placeholder="Ej: Tenis, Mandado, Televisor..."
-                  value={newNombre}
-                  onChange={(e) => setNewNombre(e.target.value)}
-                  className="h-10 rounded-xl"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1">
-                  <Label htmlFor="prod-precio" className="text-xs">Precio unitario ($ USD)</Label>
-                  <Input
-                    id="prod-precio"
-                    type="number"
-                    step="0.01"
-                    placeholder="0.00"
-                    value={newPrecio}
-                    onChange={(e) => setNewPrecio(e.target.value)}
-                    className="h-10 rounded-xl tabular"
-                  />
-                </div>
-
-                <div className="space-y-1">
-                  <Label htmlFor="prod-cant" className="text-xs">Cantidad</Label>
-                  <Input
-                    id="prod-cant"
-                    type="number"
-                    min="1"
-                    value={newCantidad}
-                    onChange={(e) => setNewCantidad(e.target.value)}
-                    className="h-10 rounded-xl tabular"
-                  />
-                </div>
-              </div>
-
-              <Button type="submit" className="w-full h-10 rounded-xl font-medium gap-2 mt-1">
-                <Plus className="w-4 h-4" /> Agregar Producto
-              </Button>
-            </form>
-          </Card>
-
-          {/* Lista de Productos */}
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <h3 className="font-bold text-sm text-foreground">Productos ({items.length})</h3>
-              {items.length > 0 && (
-                <Button variant="ghost" size="sm" onClick={clearList} className="h-7 text-xs text-muted-foreground hover:text-destructive">
-                  Vaciar lista
-                </Button>
-              )}
+      {/* Formulario Rápido de Agregar Precio */}
+      <div className="glass rounded-3xl p-5 space-y-4 enter-up" style={{ animationDelay: '60ms' }}>
+        <h3 className="font-bold text-sm text-foreground">Agregar costo</h3>
+        
+        <form onSubmit={handleAddItem} className="space-y-3">
+          <div className="grid grid-cols-12 gap-3">
+            {/* Precio USD (Input Principal) */}
+            <div className="col-span-8 space-y-1">
+              <Label htmlFor="prod-precio" className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                Precio ($ USD) *
+              </Label>
+              <Input
+                id="prod-precio"
+                type="number"
+                step="0.01"
+                placeholder="0.00"
+                value={newPrecio}
+                onChange={(e) => setNewPrecio(e.target.value)}
+                className="h-12 rounded-2xl glass border-0 bg-transparent text-xl font-bold finance-number focus-visible:ring-1 focus-visible:ring-primary/30"
+                autoFocus
+              />
             </div>
 
-            {items.length === 0 ? (
-              <Card className="p-8 rounded-2xl border-dashed border-border bg-card/40 text-center text-xs text-muted-foreground">
-                No hay productos en la lista. Agrega uno arriba para comenzar el cálculo.
-              </Card>
-            ) : (
-              <div className="space-y-2">
-                {items.map((item) => (
-                  <Card key={item.id} className="p-3.5 rounded-2xl border-border bg-card flex items-center justify-between gap-3">
-                    <div className="min-w-0">
-                      <p className="font-semibold text-sm text-foreground truncate">{item.nombre}</p>
-                      <p className="text-xs text-muted-foreground tabular">
-                        ${item.precio.toFixed(2)} x {item.cantidad} u.
-                      </p>
-                    </div>
-
-                    <div className="flex items-center gap-3">
-                      <span className="font-bold text-sm text-foreground tabular">
-                        ${(item.precio * item.cantidad).toFixed(2)}
-                      </span>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => removeItem(item.id)}
-                        className="w-8 h-8 rounded-xl text-muted-foreground hover:text-destructive"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </Card>
-                ))}
-              </div>
-            )}
+            {/* Cantidad */}
+            <div className="col-span-4 space-y-1">
+              <Label htmlFor="prod-cant" className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                Cant.
+              </Label>
+              <Input
+                id="prod-cant"
+                type="number"
+                min="1"
+                value={newCantidad}
+                onChange={(e) => setNewCantidad(e.target.value)}
+                className="h-12 rounded-2xl glass border-0 bg-transparent text-base font-bold text-center finance-number focus-visible:ring-1 focus-visible:ring-primary/30"
+              />
+            </div>
           </div>
-        </div>
 
-        {/* Columna Derecha: Summary & Guardar (5 Cols) */}
-        <div className="lg:col-span-5 space-y-4">
-          <CalculatorSummary
-            subtotal={taxInfo.subtotal}
-            taxAmount={taxInfo.impuesto}
-            taxRate={taxInfo.tasa}
-            totalUSD={totalUSD}
-            exchangeRate={rate || 17.5}
-            totalMXN={totalMXN}
-            stateName={taxInfo.estado_name}
-          />
+          {/* Nombre (Opcional) */}
+          <div className="space-y-1">
+            <Label htmlFor="prod-nombre" className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+              Nombre / Nota <span className="text-muted-foreground/60 font-normal lowercase">(opcional)</span>
+            </Label>
+            <Input
+              id="prod-nombre"
+              placeholder="Ej: Camisa, Víveres..."
+              value={newNombre}
+              onChange={(e) => setNewNombre(e.target.value)}
+              className="h-11 rounded-2xl glass border-0 bg-transparent text-sm focus-visible:ring-1 focus-visible:ring-primary/30"
+            />
+          </div>
 
           <Button
-            onClick={handleSaveList}
-            disabled={isSaving || items.length === 0}
-            className="w-full h-12 rounded-2xl text-base font-semibold shadow-sm gap-2"
+            type="submit"
+            className="w-full h-12 rounded-2xl font-semibold text-sm gradient-primary border-0 shadow-none flex items-center justify-center gap-2 active:scale-[0.98] transition-transform"
           >
-            <BookmarkPlus className="w-5 h-5" />
-            {isSaving ? 'Guardando...' : 'Guardar Compra en Historial'}
+            <Plus className="w-4 h-4" /> Agregar ítem
           </Button>
+        </form>
+      </div>
+
+      {/* Lista de Productos + Resumen */}
+      <div className="space-y-4 enter-up" style={{ animationDelay: '120ms' }}>
+        <div className="flex items-center justify-between px-1">
+          <h3 className="font-bold text-sm text-foreground">
+            Lista ({items.length})
+          </h3>
+          {items.length > 0 && (
+            <button
+              onClick={clearList}
+              className="text-xs text-rose-500 font-semibold hover:underline btn-xs"
+            >
+              Vaciar lista
+            </button>
+          )}
         </div>
+
+        {items.length === 0 ? (
+          <div className="glass rounded-3xl p-8 text-center space-y-1">
+            <p className="text-xs font-semibold text-foreground">Tu lista está vacía</p>
+            <p className="text-[11px] text-muted-foreground">
+              Ingresa el precio arriba para ir sumando tus compras al instante.
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {items.map((item) => (
+              <div
+                key={item.id}
+                className="glass rounded-2xl p-3.5 flex items-center justify-between gap-3 glass-hover"
+              >
+                <div className="min-w-0">
+                  <p className="font-semibold text-xs text-foreground truncate">{item.nombre}</p>
+                  <p className="text-[11px] text-muted-foreground finance-number">
+                    ${item.precio.toFixed(2)} x {item.cantidad} u.
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-3 shrink-0">
+                  <span className="font-bold text-sm text-foreground finance-number">
+                    ${(item.precio * item.cantidad).toFixed(2)}
+                  </span>
+                  <button
+                    onClick={() => removeItem(item.id)}
+                    className="w-8 h-8 rounded-xl glass flex items-center justify-center text-muted-foreground hover:text-rose-500 transition-colors btn-xs"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Resumen Final */}
+        {items.length > 0 && (
+          <div className="space-y-4 pt-2">
+            <CalculatorSummary
+              subtotal={taxInfo.subtotal}
+              taxAmount={taxInfo.impuesto}
+              taxRate={taxInfo.tasa}
+              totalUSD={totalUSD}
+              exchangeRate={rate || 17.5}
+              totalMXN={totalMXN}
+              stateName={taxInfo.estado_name}
+            />
+
+            <Button
+              onClick={handleSaveList}
+              disabled={isSaving}
+              className="w-full h-12 rounded-2xl font-semibold text-sm gradient-primary border-0 flex items-center justify-center gap-2 shadow-none active:scale-[0.98] transition-transform"
+            >
+              <BookmarkPlus className="w-4 h-4" />
+              {isSaving ? 'Guardando...' : 'Guardar compra en historial'}
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -2,13 +2,11 @@
 
 // ============================================================
 // features/calculator/components/CalculatorSummary.tsx
-// Resumen desglosado de la compra (Subtotal, Impuesto, Total USD y MXN)
+// Resumen desglosado de la compra — Liquid Glass
 // ============================================================
 
 import { formatUSD, formatMXN, formatRate } from '@/utils/currency.utils';
 import { formatTaxRate } from '@/utils/tax.utils';
-import { Card } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
 
 interface CalculatorSummaryProps {
   subtotal: number;
@@ -30,41 +28,47 @@ export function CalculatorSummary({
   stateName,
 }: CalculatorSummaryProps) {
   return (
-    <Card className="p-6 rounded-3xl border-border bg-card space-y-4 shadow-sm">
-      <h3 className="font-bold text-base text-foreground">Desglose de la Compra</h3>
+    <div className="glass rounded-3xl p-5 sm:p-6 space-y-4">
+      <h3 className="font-bold text-sm text-foreground">Desglose de la Compra</h3>
 
-      <div className="space-y-2.5 text-sm">
+      <div className="space-y-2.5 text-xs">
         {/* Subtotal */}
-        <div className="flex justify-between items-center">
-          <span className="text-muted-foreground">Subtotal (sin impuesto)</span>
-          <span className="font-semibold text-foreground tabular">{formatUSD(subtotal)}</span>
+        <div className="flex justify-between items-center text-muted-foreground">
+          <span>Subtotal</span>
+          <span className="font-semibold text-foreground finance-number">{formatUSD(subtotal)}</span>
         </div>
 
         {/* Impuesto por Estado */}
-        <div className="flex justify-between items-center">
-          <span className="text-muted-foreground">
-            Impuesto {stateName} ({formatTaxRate(taxRate)})
+        <div className="flex justify-between items-center text-muted-foreground">
+          <span>
+            Sales Tax ({stateName} {formatTaxRate(taxRate)})
           </span>
-          <span className="font-semibold text-foreground tabular">+{formatUSD(taxAmount)}</span>
+          <span className="font-semibold text-foreground finance-number">+{formatUSD(taxAmount)}</span>
         </div>
 
-        <Separator />
+        <div className="h-px bg-border/50 my-1" />
 
         {/* Total USD */}
-        <div className="flex justify-between items-center pt-1">
-          <span className="font-bold text-base text-foreground">Total USD</span>
-          <span className="font-extrabold text-xl text-foreground tabular">{formatUSD(totalUSD)}</span>
+        <div className="flex justify-between items-center pt-0.5">
+          <span className="font-bold text-sm text-foreground">Total USD</span>
+          <span className="font-black text-xl text-foreground finance-number">{formatUSD(totalUSD)}</span>
         </div>
 
         {/* Total equivalente MXN */}
-        <div className="p-4 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-between mt-2">
+        <div
+          className="rounded-2xl p-4 flex items-center justify-between mt-2"
+          style={{
+            background: 'linear-gradient(135deg, rgb(var(--blob-1) / 0.25), rgb(var(--blob-2) / 0.15))',
+            border: '1px solid var(--glass-border)',
+          }}
+        >
           <div>
-            <span className="text-xs font-semibold text-primary block">Equivalente a Pesos</span>
-            <span className="text-[11px] text-muted-foreground">Tasa: 1 USD = {formatRate(exchangeRate)} MXN</span>
+            <span className="text-[11px] font-bold text-primary block">Equivalente en Pesos</span>
+            <span className="text-[10px] text-muted-foreground">Tasa: {formatRate(exchangeRate)} MXN</span>
           </div>
-          <span className="font-black text-2xl text-primary tabular">{formatMXN(totalMXN)}</span>
+          <span className="font-black text-xl text-primary finance-number">{formatMXN(totalMXN)}</span>
         </div>
       </div>
-    </Card>
+    </div>
   );
 }

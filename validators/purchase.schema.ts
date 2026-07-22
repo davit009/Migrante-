@@ -8,9 +8,10 @@ import { z } from 'zod';
 export const purchaseItemSchema = z.object({
   nombre: z
     .string()
-    .min(1, 'Escribe el nombre del producto')
     .max(100, 'Nombre demasiado largo')
-    .trim(),
+    .optional()
+    .or(z.literal(''))
+    .transform((val) => val?.trim() || 'Producto'),
   precio: z
     .number({ error: 'El precio debe ser un número válido' })
     .nonnegative('El precio no puede ser negativo')

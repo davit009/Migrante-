@@ -32,6 +32,7 @@ export function TransactionForm({ onSubmit, isSubmitting }: TransactionFormProps
     register,
     handleSubmit,
     setValue,
+    watch,
     reset,
     formState: { errors },
   } = useForm<any>({
@@ -61,6 +62,9 @@ export function TransactionForm({ onSubmit, isSubmitting }: TransactionFormProps
     });
     reset();
   };
+
+  const monedaValue = watch('moneda') || 'USD';
+  const categoriaValue = watch('categoria') || availableCategories[0]?.value || 'supermercado';
 
   return (
     <Card className="p-5 rounded-3xl border-border bg-card shadow-sm space-y-4">
@@ -122,7 +126,7 @@ export function TransactionForm({ onSubmit, isSubmitting }: TransactionFormProps
 
           <div className="col-span-4 space-y-1">
             <Label htmlFor="tx-moneda" className="text-xs">Moneda</Label>
-            <Select defaultValue="USD" onValueChange={(val) => val && setValue('moneda', val)}>
+            <Select value={monedaValue} onValueChange={(val) => val && setValue('moneda', val)}>
               <SelectTrigger id="tx-moneda" className="h-11 rounded-xl font-semibold">
                 <SelectValue />
               </SelectTrigger>
@@ -138,7 +142,7 @@ export function TransactionForm({ onSubmit, isSubmitting }: TransactionFormProps
         <div className="space-y-1">
           <Label htmlFor="tx-cat" className="text-xs">Categoría</Label>
           <Select
-            defaultValue={availableCategories[0]?.value}
+            value={categoriaValue}
             onValueChange={(val) => val && setValue('categoria', val)}
           >
             <SelectTrigger id="tx-cat" className="h-11 rounded-xl">
