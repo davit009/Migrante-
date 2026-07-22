@@ -103,7 +103,7 @@ export function ConverterCard() {
         {/* Moneda Origen */}
         <div className="glass rounded-2xl p-4 space-y-1">
           <div className="flex items-center justify-between text-[11px] text-muted-foreground font-medium">
-            <span>Tú envías</span>
+            <span>Monto a convertir</span>
             <span className="text-foreground font-semibold">
               {direction === 'USD_TO_MXN' ? '🇺🇸 USD' : '🇲🇽 MXN'}
             </span>
