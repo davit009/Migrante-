@@ -10,7 +10,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 const PUBLIC_ROUTES = ['/', '/login', '/register', '/converter', '/calculator', '/remesas'];
 
 // Rutas públicas de API
-const PUBLIC_API_ROUTES = ['/api/exchange-rate', '/api/keep-alive', '/api/auth/callback'];
+const PUBLIC_API_ROUTES = ['/api/exchange-rate', '/api/keep-alive', '/api/auth/callback', '/api/investment-rates'];
 
 export async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });

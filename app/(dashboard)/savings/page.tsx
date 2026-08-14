@@ -12,6 +12,7 @@ import { useExchangeRate } from '@/features/converter/hooks/useExchangeRate';
 import { TransactionForm } from '@/features/savings/components/TransactionForm';
 import { SuggestedSavingsCard } from '@/features/savings/components/SuggestedSavingsCard';
 import { SavingsGoalsSection } from '@/features/savings/components/SavingsGoalsSection';
+import { InvestmentSimulatorCard } from '@/features/savings/components/InvestmentSimulatorCard';
 import { formatUSD, formatMXN } from '@/utils/currency.utils';
 import { formatDateShort, getTodayISO, getMonthKey, formatMonthLabel } from '@/utils/date.utils';
 import { calculateSuggestedBudget } from '@/utils/budget.utils';
@@ -147,6 +148,9 @@ export default function SavingsPage() {
         isContributing={isContributing}
         onDelete={deleteGoal}
       />
+
+      {/* Simulador de Inversión */}
+      <InvestmentSimulatorCard amountUSD={balanceUSD} />
 
       {/* Formulario + Lista de Movimientos */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
