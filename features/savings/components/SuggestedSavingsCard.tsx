@@ -16,6 +16,8 @@ interface SuggestedSavingsCardProps {
   rate: number;
   onRegisterSavings: () => void;
   isRegistering?: boolean;
+  /** Texto del periodo que cubre `incomeUSD`, ej. "Agosto 2026" */
+  periodLabel?: string;
 }
 
 export function SuggestedSavingsCard({
@@ -23,6 +25,7 @@ export function SuggestedSavingsCard({
   rate,
   onRegisterSavings,
   isRegistering,
+  periodLabel,
 }: SuggestedSavingsCardProps) {
   if (incomeUSD <= 0) {
     return (
@@ -30,7 +33,9 @@ export function SuggestedSavingsCard({
         <Lightbulb className="w-6 h-6 text-primary mx-auto" />
         <p className="text-sm font-semibold text-foreground">Plan de Ahorro Sugerido</p>
         <p className="text-xs text-muted-foreground">
-          Registra tus ingresos para ver cómo distribuir tu sueldo.
+          {periodLabel
+            ? `Sin ingresos registrados en ${periodLabel}.`
+            : 'Registra tus ingresos para ver cómo distribuir tu sueldo.'}
         </p>
       </Card>
     );
@@ -75,7 +80,7 @@ export function SuggestedSavingsCard({
         <div>
           <h3 className="font-bold text-sm text-foreground">Plan de Ahorro Sugerido</h3>
           <p className="text-xs text-muted-foreground mt-0.5">
-            Distribución recomendada de tus ingresos totales ({formatUSD(incomeUSD)}) con la regla 50/30/20.
+            Distribución recomendada de tus ingresos{periodLabel ? ` de ${periodLabel}` : ' totales'} ({formatUSD(incomeUSD)}) con la regla 50/30/20.
           </p>
         </div>
       </div>

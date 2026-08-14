@@ -124,6 +124,29 @@ export interface ConversionResult {
   fecha: string;
 }
 
+// ─── Metas de Ahorro ─────────────────────────────────────────
+export type GoalStatus = 'activa' | 'completada' | 'cancelada';
+
+export interface SavingsGoal {
+  id: string;
+  user_id: string;
+  nombre: string;
+  monto_objetivo: number;
+  monto_actual: number;
+  moneda: 'USD' | 'MXN';
+  fecha_limite: string | null;
+  estado: GoalStatus;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface SavingsGoalCreate {
+  nombre: string;
+  monto_objetivo: number;
+  moneda: 'USD' | 'MXN';
+  fecha_limite?: string | null;
+}
+
 // ─── Dashboard ───────────────────────────────────────────────
 export interface DashboardStats {
   balance_usd: number;

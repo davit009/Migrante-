@@ -16,14 +16,15 @@ import { getCategoryByValue } from '@/constants/categories';
 import { StatCard } from '@/features/dashboard/components/StatCard';
 import { ConverterCard } from '@/features/converter/components/ConverterCard';
 import { Button } from '@/components/ui/button';
-import { 
-  Wallet, 
-  TrendingUp, 
-  TrendingDown, 
-  Plus, 
-  Calculator, 
-  PiggyBank, 
-  ArrowRight 
+import {
+  Wallet,
+  TrendingUp,
+  TrendingDown,
+  Plus,
+  Calculator,
+  PiggyBank,
+  ArrowRight,
+  Send
 } from 'lucide-react';
 
 export default function DashboardPage() {
@@ -107,27 +108,39 @@ export default function DashboardPage() {
             <h2 className="text-base font-bold tracking-tight text-foreground px-1">
               Herramientas
             </h2>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-3 gap-2.5">
               <Link href="/calculator">
-                <div className="glass rounded-3xl p-4 flex flex-col gap-2.5 glass-hover">
-                  <div className="w-9 h-9 rounded-2xl bg-primary/10 text-primary flex items-center justify-center">
-                    <Calculator className="w-4 h-4" />
+                <div className="glass rounded-3xl p-3 flex flex-col gap-2 glass-hover">
+                  <div className="w-8 h-8 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+                    <Calculator className="w-3.5 h-3.5" />
                   </div>
                   <div>
-                    <span className="font-bold text-xs text-foreground block">Calculadora</span>
-                    <span className="text-[10px] text-muted-foreground">Compras + Tax</span>
+                    <span className="font-bold text-[11px] text-foreground block leading-tight">Calculadora</span>
+                    <span className="text-[9px] text-muted-foreground">Compras + Tax</span>
                   </div>
                 </div>
               </Link>
 
               <Link href="/savings">
-                <div className="glass rounded-3xl p-4 flex flex-col gap-2.5 glass-hover">
-                  <div className="w-9 h-9 rounded-2xl badge-income flex items-center justify-center">
-                    <PiggyBank className="w-4 h-4" />
+                <div className="glass rounded-3xl p-3 flex flex-col gap-2 glass-hover">
+                  <div className="w-8 h-8 rounded-xl badge-income flex items-center justify-center">
+                    <PiggyBank className="w-3.5 h-3.5" />
                   </div>
                   <div>
-                    <span className="font-bold text-xs text-foreground block">Mis Ahorros</span>
-                    <span className="text-[10px] text-muted-foreground">Ingresos & Gastos</span>
+                    <span className="font-bold text-[11px] text-foreground block leading-tight">Ahorros</span>
+                    <span className="text-[9px] text-muted-foreground">Ingresos y gastos</span>
+                  </div>
+                </div>
+              </Link>
+
+              <Link href="/remesas">
+                <div className="glass rounded-3xl p-3 flex flex-col gap-2 glass-hover">
+                  <div className="w-8 h-8 rounded-xl bg-sky-500/10 text-sky-600 dark:text-sky-400 flex items-center justify-center">
+                    <Send className="w-3.5 h-3.5" />
+                  </div>
+                  <div>
+                    <span className="font-bold text-[11px] text-foreground block leading-tight">Remesas</span>
+                    <span className="text-[9px] text-muted-foreground">Comparar envíos</span>
                   </div>
                 </div>
               </Link>

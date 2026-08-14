@@ -7,7 +7,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ConverterCard } from '@/features/converter/components/ConverterCard';
 import { Button } from '@/components/ui/button';
-import { Calculator, PiggyBank, ArrowRight } from 'lucide-react';
+import { Calculator, PiggyBank, ArrowRight, Send } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Conversor USD a MXN | Migrante$',
@@ -75,7 +75,7 @@ export default function HomePage() {
         </div>
 
         {/* Cards de Funciones */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 enter-up" style={{ animationDelay: '160ms' }}>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 enter-up" style={{ animationDelay: '160ms' }}>
           {/* Calculadora */}
           <div className="glass rounded-3xl p-5 space-y-3 glass-hover">
             <div className="w-11 h-11 rounded-2xl bg-primary/10 flex items-center justify-center">
@@ -108,6 +108,24 @@ export default function HomePage() {
             <Link href="/register">
               <Button variant="ghost" size="sm" className="rounded-2xl h-9 text-xs w-full justify-between px-3 mt-1 btn-xs">
                 Ver más <ArrowRight className="w-3.5 h-3.5" />
+              </Button>
+            </Link>
+          </div>
+
+          {/* Remesas */}
+          <div className="glass rounded-3xl p-5 space-y-3 glass-hover">
+            <div className="w-11 h-11 rounded-2xl bg-sky-500/10 flex items-center justify-center">
+              <Send className="w-5 h-5 text-sky-600 dark:text-sky-400" />
+            </div>
+            <div>
+              <h3 className="font-bold text-foreground">Comparador de Envío</h3>
+              <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                Compara comisiones y cuánto llegaría con cada proveedor de remesas.
+              </p>
+            </div>
+            <Link href="/remesas">
+              <Button variant="ghost" size="sm" className="rounded-2xl h-9 text-xs w-full justify-between px-3 mt-1 btn-xs">
+                Comparar ahora <ArrowRight className="w-3.5 h-3.5" />
               </Button>
             </Link>
           </div>

@@ -7,7 +7,7 @@ import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
 // Rutas públicas (accesibles sin registro/login)
-const PUBLIC_ROUTES = ['/', '/login', '/register', '/converter', '/calculator'];
+const PUBLIC_ROUTES = ['/', '/login', '/register', '/converter', '/calculator', '/remesas'];
 
 // Rutas públicas de API
 const PUBLIC_API_ROUTES = ['/api/exchange-rate', '/api/keep-alive', '/api/auth/callback'];

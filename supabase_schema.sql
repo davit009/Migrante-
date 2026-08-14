@@ -199,3 +199,33 @@ ALTER TABLE public.saved_conversions ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Los usuarios administran sus conversiones guardadas"
   ON public.saved_conversions FOR ALL
   USING (auth.uid() = user_id);
+
+
+-- 8. TABLA: savings_goals (Metas de Ahorro)
+CREATE TABLE IF NOT EXISTS public.savings_goals (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id         UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  nombre          TEXT NOT NULL,
+  monto_objetivo  NUMERIC(12, 2) NOT NULL CHECK (monto_objetivo > 0),
+  monto_actual    NUMERIC(12, 2) NOT NULL DEFAULT 0 CHECK (monto_actual >= 0),
+  moneda          TEXT NOT NULL DEFAULT 'USD' CHECK (moneda IN ('USD', 'MXN')),
+  fecha_limite    DATE,
+  estado          TEXT NOT NULL DEFAULT 'activa' CHECK (estado IN ('activa', 'completada', 'cancelada')),
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_savings_goals_user_id ON public.savings_goals(user_id);
+
+-- RLS para savings_goals
+ALTER TABLE public.savings_goals ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Los usuarios administran sus metas de ahorro"
+  ON public.savings_goals FOR ALL
+  USING (auth.uid() = user_id);
+
+-- Reutiliza el trigger de updated_at ya definido para profiles
+CREATE TRIGGER update_savings_goals_updated_at
+  BEFORE UPDATE ON public.savings_goals
+  FOR EACH ROW
+  EXECUTE PROCEDURE update_updated_at_column();
