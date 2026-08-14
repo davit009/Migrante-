@@ -17,9 +17,10 @@ import { useAuth } from '../hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { GoogleButton } from './GoogleButton';
 
 const inputClass =
-  'h-12 rounded-2xl glass border-0 bg-transparent text-sm focus-visible:ring-1 focus-visible:ring-primary/30';
+  'h-12 rounded-2xl glass border-0 bg-transparent focus-visible:ring-1 focus-visible:ring-primary/30';
 
 export function RegisterForm() {
   const [isLoading, setIsLoading] = useState(false);
@@ -135,6 +136,17 @@ export function RegisterForm() {
       >
         {isLoading ? 'Creando cuenta...' : 'Crear cuenta gratis →'}
       </Button>
+
+      {/* Divisor + Google */}
+      <div className="flex items-center gap-3 pt-1">
+        <div className="flex-1 h-px bg-border/50" />
+        <span className="text-[11px] text-muted-foreground font-medium uppercase tracking-wider">
+          O continúa con
+        </span>
+        <div className="flex-1 h-px bg-border/50" />
+      </div>
+
+      <GoogleButton />
     </form>
   );
 }

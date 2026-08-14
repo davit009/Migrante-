@@ -20,12 +20,24 @@ export type TransactionType = 'ingreso' | 'gasto';
 
 export type TransactionCategory =
   | 'trabajo'
-  | 'gasolina'
-  | 'supermercado'
+  | 'freelance'
+  | 'negocio'
+  | 'propinas'
+  | 'remesa'
   | 'renta'
+  | 'supermercado'
   | 'comida'
-  | 'ropa'
+  | 'gasolina'
+  | 'transporte'
   | 'salud'
+  | 'ropa'
+  | 'servicios'
+  | 'telefono'
+  | 'entretenimiento'
+  | 'envio'
+  | 'educacion'
+  | 'seguros'
+  | 'ahorro'
   | 'otros';
 
 export interface Transaction {

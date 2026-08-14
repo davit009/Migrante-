@@ -8,6 +8,7 @@
 import { useState } from 'react';
 import { useExchangeRate } from '../hooks/useExchangeRate';
 import { applyConversionMode, formatCurrency, formatRate } from '@/utils/currency.utils';
+import { conversionService } from '../services/conversion.service';
 import type { ConversionMode } from '@/types/app.types';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { useRouter } from 'next/navigation';
@@ -31,6 +32,7 @@ export function ConverterCard() {
   const [amount, setAmount] = useState<string>('100');
   const [direction, setDirection] = useState<'USD_TO_MXN' | 'MXN_TO_USD'>('USD_TO_MXN');
   const [mode, setMode] = useState<ConversionMode>('promedio');
+  const [isSaving, setIsSaving] = useState(false);
 
   const effectiveRate = applyConversionMode(baseRate, mode);
   const numericAmount = parseFloat(amount) || 0;
@@ -45,7 +47,7 @@ export function ConverterCard() {
     setDirection((prev) => (prev === 'USD_TO_MXN' ? 'MXN_TO_USD' : 'USD_TO_MXN'));
   };
 
-  const handleSaveCalculation = () => {
+  const handleSaveCalculation = async () => {
     if (!isAuthenticated) {
       toast.info('Crea tu cuenta para guardar tus cálculos.', {
         action: {
@@ -55,8 +57,30 @@ export function ConverterCard() {
       });
       return;
     }
-    toast.success('Conversión guardada en tus registros');
-    router.push('/history');
+
+    if (numericAmount <= 0) {
+      toast.error('Ingresa un monto válido antes de guardar');
+      return;
+    }
+
+    try {
+      setIsSaving(true);
+      await conversionService.saveConversion({
+        monto_origen: numericAmount,
+        moneda_origen: direction === 'USD_TO_MXN' ? 'USD' : 'MXN',
+        monto_destino: convertedAmount,
+        moneda_destino: direction === 'USD_TO_MXN' ? 'MXN' : 'USD',
+        tipo_cambio: effectiveRate,
+        modo: mode,
+        fecha: new Date().toISOString(),
+      });
+      toast.success('Conversión guardada en tus registros');
+      router.push('/history');
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Error al guardar la conversión');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -179,10 +203,11 @@ export function ConverterCard() {
       <div className="space-y-3">
         <Button
           onClick={handleSaveCalculation}
+          disabled={isSaving}
           className="w-full h-12 rounded-2xl text-sm font-semibold gradient-primary border-0 flex items-center justify-center gap-2 shadow-none active:scale-[0.98] transition-transform"
         >
           <BookmarkPlus className="w-4 h-4" />
-          Guardar cálculo
+          {isSaving ? 'Guardando...' : 'Guardar cálculo'}
         </Button>
 
         {!isAuthenticated && (

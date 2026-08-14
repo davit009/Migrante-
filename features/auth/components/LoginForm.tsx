@@ -8,7 +8,6 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
@@ -18,6 +17,7 @@ import { useAuth } from '../hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { GoogleButton } from './GoogleButton';
 
 export function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
@@ -60,7 +60,7 @@ export function LoginForm() {
             type="email"
             placeholder="tu@correo.com"
             disabled={isLoading}
-            className="h-12 rounded-2xl glass border-0 bg-transparent text-sm focus-visible:ring-1 focus-visible:ring-primary/30"
+            className="h-12 rounded-2xl glass border-0 bg-transparent focus-visible:ring-1 focus-visible:ring-primary/30"
             {...register('email')}
           />
           {errors.email && (
@@ -78,7 +78,7 @@ export function LoginForm() {
             type="password"
             placeholder="••••••••"
             disabled={isLoading}
-            className="h-12 rounded-2xl glass border-0 bg-transparent text-sm focus-visible:ring-1 focus-visible:ring-primary/30"
+            className="h-12 rounded-2xl glass border-0 bg-transparent focus-visible:ring-1 focus-visible:ring-primary/30"
             {...register('password')}
           />
           {errors.password && (
@@ -96,7 +96,16 @@ export function LoginForm() {
         </Button>
       </form>
 
+      {/* Divisor + Google */}
+      <div className="flex items-center gap-3">
+        <div className="flex-1 h-px bg-border/50" />
+        <span className="text-[11px] text-muted-foreground font-medium uppercase tracking-wider">
+          O continúa con
+        </span>
+        <div className="flex-1 h-px bg-border/50" />
+      </div>
 
+      <GoogleButton />
     </div>
   );
 }

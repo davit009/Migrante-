@@ -5,17 +5,17 @@
 // Historial Unificado de Movimientos y Listas de Compras Guardadas
 // ============================================================
 
-import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { purchaseService } from '@/features/calculator/services/purchase.service';
+import { conversionService } from '@/features/converter/services/conversion.service';
 import { useSavings } from '@/features/savings/hooks/useSavings';
-import { formatUSD, formatMXN } from '@/utils/currency.utils';
+import { formatUSD, formatMXN, formatCurrency, formatRate } from '@/utils/currency.utils';
 import { formatDateShort } from '@/utils/date.utils';
 
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { History, ShoppingBag, PiggyBank } from 'lucide-react';
+import { History, ShoppingBag, PiggyBank, ArrowLeftRight } from 'lucide-react';
 import { getCategoryByValue } from '@/constants/categories';
 
 export default function HistoryPage() {
@@ -24,6 +24,11 @@ export default function HistoryPage() {
   const { data: purchaseLists = [], isLoading: isPurchasesLoading } = useQuery({
     queryKey: ['purchase-lists'],
     queryFn: () => purchaseService.getPurchaseLists(),
+  });
+
+  const { data: conversions = [], isLoading: isConversionsLoading } = useQuery({
+    queryKey: ['saved-conversions'],
+    queryFn: () => conversionService.getConversions(),
   });
 
   return (
@@ -40,12 +45,15 @@ export default function HistoryPage() {
       </div>
 
       <Tabs defaultValue="movimientos" className="space-y-6">
-        <TabsList className="grid grid-cols-2 w-full max-w-md h-12 rounded-2xl bg-muted p-1">
+        <TabsList className="grid grid-cols-3 w-full max-w-xl h-12 rounded-2xl bg-muted p-1">
           <TabsTrigger value="movimientos" className="rounded-xl font-semibold text-xs sm:text-sm">
             <PiggyBank className="w-4 h-4 mr-2" /> Movimientos ({transactions.length})
           </TabsTrigger>
           <TabsTrigger value="compras" className="rounded-xl font-semibold text-xs sm:text-sm">
-            <ShoppingBag className="w-4 h-4 mr-2" /> Compras Guardadas ({purchaseLists.length})
+            <ShoppingBag className="w-4 h-4 mr-2" /> Compras ({purchaseLists.length})
+          </TabsTrigger>
+          <TabsTrigger value="conversiones" className="rounded-xl font-semibold text-xs sm:text-sm">
+            <ArrowLeftRight className="w-4 h-4 mr-2" /> Conversiones ({conversions.length})
           </TabsTrigger>
         </TabsList>
 
@@ -130,6 +138,42 @@ export default function HistoryPage() {
                     ))}
                   </div>
                 )}
+              </Card>
+            ))
+          )}
+        </TabsContent>
+
+        {/* Tab 3: Conversiones Guardadas */}
+        <TabsContent value="conversiones" className="space-y-3">
+          {isConversionsLoading ? (
+            <div className="space-y-2">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="h-16 rounded-2xl bg-muted animate-pulse" />
+              ))}
+            </div>
+          ) : conversions.length === 0 ? (
+            <Card className="p-8 rounded-2xl text-center text-muted-foreground text-sm">
+              Sin conversiones guardadas. Prueba guardar un cálculo desde el Conversor.
+            </Card>
+          ) : (
+            conversions.map((conv) => (
+              <Card key={conv.id} className="p-4 rounded-2xl border-border bg-card flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-10 h-10 rounded-2xl bg-muted flex items-center justify-center text-xl shrink-0">
+                    <ArrowLeftRight className="w-4 h-4 text-primary" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="font-semibold text-sm text-foreground">
+                      {formatCurrency(conv.monto_origen, conv.moneda_origen)} → {formatCurrency(conv.monto_destino, conv.moneda_destino)}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      1 USD = {formatRate(conv.tipo_cambio)} MXN • {formatDateShort(conv.created_at.split('T')[0])}
+                    </p>
+                  </div>
+                </div>
+                <Badge variant="outline" className="text-[10px] px-2 py-0.5 rounded-md capitalize shrink-0">
+                  {conv.modo}
+                </Badge>
               </Card>
             ))
           )}

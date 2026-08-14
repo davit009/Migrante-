@@ -176,3 +176,26 @@ ALTER TABLE public.exchange_history ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Lectura pública del tipo de cambio"
   ON public.exchange_history FOR SELECT
   USING (true);
+
+
+-- 7. TABLA: saved_conversions (Cálculos guardados del Conversor)
+CREATE TABLE IF NOT EXISTS public.saved_conversions (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id         UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  monto_origen    NUMERIC(12, 2) NOT NULL CHECK (monto_origen > 0),
+  moneda_origen   TEXT NOT NULL CHECK (moneda_origen IN ('USD', 'MXN')),
+  monto_destino   NUMERIC(12, 2) NOT NULL,
+  moneda_destino  TEXT NOT NULL CHECK (moneda_destino IN ('USD', 'MXN')),
+  tipo_cambio     NUMERIC(10, 4) NOT NULL,
+  modo            TEXT NOT NULL DEFAULT 'promedio' CHECK (modo IN ('compra', 'venta', 'promedio')),
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_saved_conversions_user_id ON public.saved_conversions(user_id);
+
+-- RLS para saved_conversions
+ALTER TABLE public.saved_conversions ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Los usuarios administran sus conversiones guardadas"
+  ON public.saved_conversions FOR ALL
+  USING (auth.uid() = user_id);
