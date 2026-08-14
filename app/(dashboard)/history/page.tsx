@@ -14,9 +14,12 @@ import { formatDateShort } from '@/utils/date.utils';
 
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { History, ShoppingBag, PiggyBank, ArrowLeftRight } from 'lucide-react';
+import { History, ShoppingBag, PiggyBank, ArrowLeftRight, Download } from 'lucide-react';
 import { getCategoryByValue } from '@/constants/categories';
+import { arrayToCSV, downloadCSV } from '@/utils/csv.utils';
+import { getTodayISO } from '@/utils/date.utils';
 
 export default function HistoryPage() {
   const { transactions, isLoading: isTxLoading } = useSavings();
@@ -30,6 +33,78 @@ export default function HistoryPage() {
     queryKey: ['saved-conversions'],
     queryFn: () => conversionService.getConversions(),
   });
+
+  const exportMovimientos = () => {
+    const csv = arrayToCSV(
+      transactions.map((tx) => ({
+        fecha: tx.fecha,
+        tipo: tx.tipo,
+        categoria: getCategoryByValue(tx.categoria)?.label ?? tx.categoria,
+        descripcion: tx.descripcion ?? '',
+        monto: tx.monto,
+        moneda: tx.moneda,
+        monto_mxn: tx.monto_mxn ?? '',
+      })),
+      [
+        { key: 'fecha', label: 'Fecha' },
+        { key: 'tipo', label: 'Tipo' },
+        { key: 'categoria', label: 'Categoría' },
+        { key: 'descripcion', label: 'Descripción' },
+        { key: 'monto', label: 'Monto' },
+        { key: 'moneda', label: 'Moneda' },
+        { key: 'monto_mxn', label: 'Monto MXN' },
+      ]
+    );
+    downloadCSV(`migrante-movimientos-${getTodayISO()}.csv`, csv);
+  };
+
+  const exportCompras = () => {
+    const csv = arrayToCSV(
+      purchaseLists.map((list) => ({
+        fecha: list.created_at.split('T')[0],
+        nombre: list.nombre ?? '',
+        estado_usa: list.estado_usa,
+        subtotal: list.subtotal,
+        impuesto: list.impuesto,
+        total_usd: list.total_usd,
+        total_mxn: list.total_mxn,
+      })),
+      [
+        { key: 'fecha', label: 'Fecha' },
+        { key: 'nombre', label: 'Nombre' },
+        { key: 'estado_usa', label: 'Estado' },
+        { key: 'subtotal', label: 'Subtotal' },
+        { key: 'impuesto', label: 'Impuesto' },
+        { key: 'total_usd', label: 'Total USD' },
+        { key: 'total_mxn', label: 'Total MXN' },
+      ]
+    );
+    downloadCSV(`migrante-compras-${getTodayISO()}.csv`, csv);
+  };
+
+  const exportConversiones = () => {
+    const csv = arrayToCSV(
+      conversions.map((conv) => ({
+        fecha: conv.created_at.split('T')[0],
+        monto_origen: conv.monto_origen,
+        moneda_origen: conv.moneda_origen,
+        monto_destino: conv.monto_destino,
+        moneda_destino: conv.moneda_destino,
+        tipo_cambio: conv.tipo_cambio,
+        modo: conv.modo,
+      })),
+      [
+        { key: 'fecha', label: 'Fecha' },
+        { key: 'monto_origen', label: 'Monto Origen' },
+        { key: 'moneda_origen', label: 'Moneda Origen' },
+        { key: 'monto_destino', label: 'Monto Destino' },
+        { key: 'moneda_destino', label: 'Moneda Destino' },
+        { key: 'tipo_cambio', label: 'Tipo de Cambio' },
+        { key: 'modo', label: 'Modo' },
+      ]
+    );
+    downloadCSV(`migrante-conversiones-${getTodayISO()}.csv`, csv);
+  };
 
   return (
     <div className="space-y-8 max-w-4xl mx-auto py-2">
@@ -59,6 +134,13 @@ export default function HistoryPage() {
 
         {/* Tab 1: Movimientos */}
         <TabsContent value="movimientos" className="space-y-3">
+          {transactions.length > 0 && (
+            <div className="flex justify-end">
+              <Button variant="outline" size="sm" onClick={exportMovimientos} className="h-8 rounded-lg text-xs gap-1.5">
+                <Download className="w-3.5 h-3.5" /> Exportar CSV
+              </Button>
+            </div>
+          )}
           {isTxLoading ? (
             <div className="space-y-2">
               {[1, 2, 3].map((i) => (
@@ -102,6 +184,13 @@ export default function HistoryPage() {
 
         {/* Tab 2: Compras Guardadas */}
         <TabsContent value="compras" className="space-y-4">
+          {purchaseLists.length > 0 && (
+            <div className="flex justify-end">
+              <Button variant="outline" size="sm" onClick={exportCompras} className="h-8 rounded-lg text-xs gap-1.5">
+                <Download className="w-3.5 h-3.5" /> Exportar CSV
+              </Button>
+            </div>
+          )}
           {isPurchasesLoading ? (
             <div className="space-y-3">
               {[1, 2].map((i) => (
@@ -145,6 +234,13 @@ export default function HistoryPage() {
 
         {/* Tab 3: Conversiones Guardadas */}
         <TabsContent value="conversiones" className="space-y-3">
+          {conversions.length > 0 && (
+            <div className="flex justify-end">
+              <Button variant="outline" size="sm" onClick={exportConversiones} className="h-8 rounded-lg text-xs gap-1.5">
+                <Download className="w-3.5 h-3.5" /> Exportar CSV
+              </Button>
+            </div>
+          )}
           {isConversionsLoading ? (
             <div className="space-y-2">
               {[1, 2, 3].map((i) => (

@@ -229,3 +229,30 @@ CREATE TRIGGER update_savings_goals_updated_at
   BEFORE UPDATE ON public.savings_goals
   FOR EACH ROW
   EXECUTE PROCEDURE update_updated_at_column();
+
+
+-- 9. TABLA: category_budgets (Límite mensual recurrente por categoría)
+CREATE TABLE IF NOT EXISTS public.category_budgets (
+  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id         UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  categoria       TEXT NOT NULL,
+  limite_mensual  NUMERIC(12, 2) NOT NULL CHECK (limite_mensual > 0),
+  moneda          TEXT NOT NULL DEFAULT 'USD' CHECK (moneda IN ('USD', 'MXN')),
+  created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  CONSTRAINT unique_user_categoria_budget UNIQUE (user_id, categoria)
+);
+
+CREATE INDEX IF NOT EXISTS idx_category_budgets_user_id ON public.category_budgets(user_id);
+
+-- RLS para category_budgets
+ALTER TABLE public.category_budgets ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Los usuarios administran sus presupuestos por categoría"
+  ON public.category_budgets FOR ALL
+  USING (auth.uid() = user_id);
+
+CREATE TRIGGER update_category_budgets_updated_at
+  BEFORE UPDATE ON public.category_budgets
+  FOR EACH ROW
+  EXECUTE PROCEDURE update_updated_at_column();

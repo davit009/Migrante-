@@ -13,6 +13,8 @@ import { TransactionForm } from '@/features/savings/components/TransactionForm';
 import { SuggestedSavingsCard } from '@/features/savings/components/SuggestedSavingsCard';
 import { SavingsGoalsSection } from '@/features/savings/components/SavingsGoalsSection';
 import { InvestmentSimulatorCard } from '@/features/savings/components/InvestmentSimulatorCard';
+import { CategoryBudgetsSection } from '@/features/savings/components/CategoryBudgetsSection';
+import { useCategoryBudgets } from '@/features/savings/hooks/useCategoryBudgets';
 import { formatUSD, formatMXN } from '@/utils/currency.utils';
 import { formatDateShort, getTodayISO, getMonthKey, formatMonthLabel } from '@/utils/date.utils';
 import { calculateSuggestedBudget } from '@/utils/budget.utils';
@@ -49,6 +51,13 @@ export default function SavingsPage() {
     isContributing,
     deleteGoal,
   } = useSavingsGoals();
+
+  const {
+    budgets,
+    isLoading: isBudgetsLoading,
+    upsertBudget,
+    isSaving: isSavingBudget,
+  } = useCategoryBudgets();
 
   const [filterType, setFilterType] = useState<'todos' | 'ingreso' | 'gasto'>('todos');
   const [isRegisteringSavings, setIsRegisteringSavings] = useState(false);
@@ -151,6 +160,16 @@ export default function SavingsPage() {
 
       {/* Simulador de Inversión */}
       <InvestmentSimulatorCard amountUSD={balanceUSD} />
+
+      {/* Gastos por Categoría + Presupuestos */}
+      <CategoryBudgetsSection
+        transactions={transactions}
+        rate={rate || 17.5}
+        budgets={budgets}
+        isLoadingBudgets={isBudgetsLoading}
+        onSaveBudget={(categoria, limite) => upsertBudget({ categoria, limite_mensual: limite, moneda: 'USD' })}
+        isSavingBudget={isSavingBudget}
+      />
 
       {/* Formulario + Lista de Movimientos */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">

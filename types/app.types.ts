@@ -147,6 +147,23 @@ export interface SavingsGoalCreate {
   fecha_limite?: string | null;
 }
 
+// ─── Presupuestos por Categoría ──────────────────────────────
+export interface CategoryBudget {
+  id: string;
+  user_id: string;
+  categoria: string;
+  limite_mensual: number;
+  moneda: 'USD' | 'MXN';
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CategoryBudgetUpsert {
+  categoria: string;
+  limite_mensual: number;
+  moneda: 'USD' | 'MXN';
+}
+
 // ─── Dashboard ───────────────────────────────────────────────
 export interface DashboardStats {
   balance_usd: number;
