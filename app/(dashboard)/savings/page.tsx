@@ -9,14 +9,16 @@ import { useState } from 'react';
 import { useSavings } from '@/features/savings/hooks/useSavings';
 import { useExchangeRate } from '@/features/converter/hooks/useExchangeRate';
 import { TransactionForm } from '@/features/savings/components/TransactionForm';
+import { SuggestedSavingsCard } from '@/features/savings/components/SuggestedSavingsCard';
 import { formatUSD, formatMXN } from '@/utils/currency.utils';
-import { formatDateShort } from '@/utils/date.utils';
+import { formatDateShort, getTodayISO } from '@/utils/date.utils';
+import { calculateSuggestedBudget } from '@/utils/budget.utils';
 import { getCategoryByValue } from '@/constants/categories';
 
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { PiggyBank, TrendingUp, TrendingDown, Trash2, Filter } from 'lucide-react';
+import { PiggyBank, TrendingUp, TrendingDown, Trash2 } from 'lucide-react';
 
 export default function SavingsPage() {
   const { rate } = useExchangeRate();
@@ -33,11 +35,33 @@ export default function SavingsPage() {
   } = useSavings();
 
   const [filterType, setFilterType] = useState<'todos' | 'ingreso' | 'gasto'>('todos');
+  const [isRegisteringSavings, setIsRegisteringSavings] = useState(false);
 
   const filteredTransactions = transactions.filter((t) => {
     if (filterType === 'todos') return true;
     return t.tipo === filterType;
   });
+
+  const handleRegisterSuggestedSavings = async () => {
+    const { ahorro } = calculateSuggestedBudget(totalIngresosUSD);
+    if (ahorro <= 0) return;
+
+    try {
+      setIsRegisteringSavings(true);
+      await addTransaction({
+        tipo: 'gasto',
+        categoria: 'ahorro',
+        descripcion: 'Ahorro sugerido (regla 50/30/20)',
+        monto: ahorro,
+        moneda: 'USD',
+        fecha: getTodayISO(),
+      });
+    } catch {
+      // El hook useSavings ya muestra el toast de error
+    } finally {
+      setIsRegisteringSavings(false);
+    }
+  };
 
   return (
     <div className="space-y-8 max-w-4xl mx-auto py-2">
@@ -85,6 +109,14 @@ export default function SavingsPage() {
           </p>
         </Card>
       </div>
+
+      {/* Plan de Ahorro Sugerido */}
+      <SuggestedSavingsCard
+        incomeUSD={totalIngresosUSD}
+        rate={rate || 17.5}
+        onRegisterSavings={handleRegisterSuggestedSavings}
+        isRegistering={isRegisteringSavings}
+      />
 
       {/* Formulario + Lista de Movimientos */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
