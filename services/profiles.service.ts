@@ -14,7 +14,7 @@ export const profilesService = {
   async getProfile(userId: string): Promise<UserProfile | null> {
     const supabase = createClient();
     const { data, error } = await supabase
-      .from('profiles')
+      .from('migrante_profiles')
       .select('*')
       .eq('id', userId)
       .single();
@@ -33,7 +33,7 @@ export const profilesService = {
   async updateProfile(userId: string, updates: Partial<ProfileFormValues>): Promise<UserProfile> {
     const supabase = createClient();
     const { data, error } = await supabase
-      .from('profiles')
+      .from('migrante_profiles')
       .update(updates)
       .eq('id', userId)
       .select()

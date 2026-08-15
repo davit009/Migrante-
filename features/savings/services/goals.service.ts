@@ -13,7 +13,7 @@ export const goalsService = {
   async getGoals(): Promise<SavingsGoal[]> {
     const supabase = createClient();
     const { data, error } = await supabase
-      .from('savings_goals')
+      .from('migrante_savings_goals')
       .select('*')
       .order('created_at', { ascending: false });
 
@@ -31,7 +31,7 @@ export const goalsService = {
     if (!user) throw new Error('Debes iniciar sesión para crear una meta de ahorro');
 
     const { data, error } = await supabase
-      .from('savings_goals')
+      .from('migrante_savings_goals')
       .insert({
         user_id: user.id,
         nombre: payload.nombre,
@@ -56,7 +56,7 @@ export const goalsService = {
     const nuevoEstado = nuevoMonto >= goal.monto_objetivo ? 'completada' : goal.estado;
 
     const { data, error } = await supabase
-      .from('savings_goals')
+      .from('migrante_savings_goals')
       .update({ monto_actual: nuevoMonto, estado: nuevoEstado })
       .eq('id', goal.id)
       .select()
@@ -71,7 +71,7 @@ export const goalsService = {
    */
   async deleteGoal(id: string): Promise<void> {
     const supabase = createClient();
-    const { error } = await supabase.from('savings_goals').delete().eq('id', id);
+    const { error } = await supabase.from('migrante_savings_goals').delete().eq('id', id);
     if (error) throw new Error(`Error al eliminar la meta: ${error.message}`);
   },
 };

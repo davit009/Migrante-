@@ -23,7 +23,7 @@ export const conversionService = {
     if (!user) throw new Error('Debes iniciar sesión para guardar conversiones');
 
     const { data, error } = await supabase
-      .from('saved_conversions')
+      .from('migrante_saved_conversions')
       .insert({
         user_id: user.id,
         monto_origen: result.monto_origen,
@@ -49,7 +49,7 @@ export const conversionService = {
   async getConversions(): Promise<SavedConversion[]> {
     const supabase = createClient();
     const { data, error } = await supabase
-      .from('saved_conversions')
+      .from('migrante_saved_conversions')
       .select('*')
       .order('created_at', { ascending: false });
 

@@ -13,7 +13,7 @@ export const budgetsService = {
   async getBudgets(): Promise<CategoryBudget[]> {
     const supabase = createClient();
     const { data, error } = await supabase
-      .from('category_budgets')
+      .from('migrante_category_budgets')
       .select('*');
 
     if (error) throw new Error(`Error al consultar presupuestos: ${error.message}`);
@@ -31,7 +31,7 @@ export const budgetsService = {
     if (!user) throw new Error('Debes iniciar sesión para definir un presupuesto');
 
     const { data, error } = await supabase
-      .from('category_budgets')
+      .from('migrante_category_budgets')
       .upsert(
         {
           user_id: user.id,
@@ -53,7 +53,7 @@ export const budgetsService = {
    */
   async deleteBudget(id: string): Promise<void> {
     const supabase = createClient();
-    const { error } = await supabase.from('category_budgets').delete().eq('id', id);
+    const { error } = await supabase.from('migrante_category_budgets').delete().eq('id', id);
     if (error) throw new Error(`Error al eliminar el presupuesto: ${error.message}`);
   },
 };

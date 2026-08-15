@@ -24,7 +24,7 @@ export async function GET() {
 
     // ── Nivel 1: Buscar en DB si ya tenemos el tipo de hoy ──────
     const { data: cached } = await supabase
-      .from('exchange_history')
+      .from('migrante_exchange_history')
       .select('*')
       .eq('fecha', today)
       .single();
@@ -62,7 +62,7 @@ export async function GET() {
 
     // ── Guardar en DB para caché diaria ────────────────────────
     await supabase
-      .from('exchange_history')
+      .from('migrante_exchange_history')
       .upsert(
         { fecha: today, usd_mxn, fuente: 'open.er-api.com' },
         { onConflict: 'fecha' } // UNIQUE(fecha) previene duplicados
@@ -83,7 +83,7 @@ export async function GET() {
     try {
       const supabase = await createClient();
       const { data: lastKnown } = await supabase
-        .from('exchange_history')
+        .from('migrante_exchange_history')
         .select('*')
         .order('fecha', { ascending: false })
         .limit(1)

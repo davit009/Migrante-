@@ -18,7 +18,7 @@ export async function GET() {
   const supabase = await createClient();
 
   const { error } = await supabase
-    .from('exchange_history')
+    .from('migrante_exchange_history')
     .select('id')
     .limit(1);
 
