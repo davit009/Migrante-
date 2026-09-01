@@ -94,7 +94,7 @@ export default function SavingsPage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground flex items-center gap-2.5">
-            <PiggyBank className="w-7 h-7 text-emerald-600 dark:text-emerald-400" />
+            <PiggyBank className="w-7 h-7 text-success" />
             Control de Ahorros
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
@@ -118,9 +118,9 @@ export default function SavingsPage() {
         {/* Ingresos */}
         <Card className="p-5 rounded-3xl border-border bg-card space-y-1">
           <span className="text-xs font-medium text-muted-foreground flex items-center gap-1">
-            <TrendingUp className="w-3.5 h-3.5 text-emerald-500" /> Total Ingresos
+            <TrendingUp className="w-3.5 h-3.5 text-success" /> Total Ingresos
           </span>
-          <h3 className="text-2xl font-bold text-emerald-600 dark:text-emerald-400 tabular">{formatUSD(totalIngresosUSD)}</h3>
+          <h3 className="text-2xl font-bold text-success tabular">{formatUSD(totalIngresosUSD)}</h3>
           <p className="text-xs text-muted-foreground tabular">
             ≈ {formatMXN(totalIngresosUSD * (rate || 17.5))}
           </p>
@@ -129,9 +129,9 @@ export default function SavingsPage() {
         {/* Gastos */}
         <Card className="p-5 rounded-3xl border-border bg-card space-y-1">
           <span className="text-xs font-medium text-muted-foreground flex items-center gap-1">
-            <TrendingDown className="w-3.5 h-3.5 text-rose-500" /> Total Gastos
+            <TrendingDown className="w-3.5 h-3.5 text-destructive" /> Total Gastos
           </span>
-          <h3 className="text-2xl font-bold text-rose-600 dark:text-rose-400 tabular">{formatUSD(totalGastosUSD)}</h3>
+          <h3 className="text-2xl font-bold text-destructive tabular">{formatUSD(totalGastosUSD)}</h3>
           <p className="text-xs text-muted-foreground tabular">
             ≈ {formatMXN(totalGastosUSD * (rate || 17.5))}
           </p>
@@ -240,7 +240,7 @@ export default function SavingsPage() {
                       <div className="text-right">
                         <p
                           className={`font-bold text-sm tabular ${
-                            isIncome ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'
+                            isIncome ? 'text-success' : 'text-destructive'
                           }`}
                         >
                           {isIncome ? '+' : '-'}{formatUSD(tx.monto)}

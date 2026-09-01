@@ -244,7 +244,7 @@ export default function CalculatorPage() {
           {items.length > 0 && (
             <button
               onClick={clearList}
-              className="text-xs text-rose-500 font-semibold hover:underline btn-xs"
+              className="text-xs text-destructive font-semibold hover:underline btn-xs"
             >
               Vaciar lista
             </button>
@@ -278,7 +278,7 @@ export default function CalculatorPage() {
                   </span>
                   <button
                     onClick={() => removeItem(item.id)}
-                    className="w-8 h-8 rounded-xl glass flex items-center justify-center text-muted-foreground hover:text-rose-500 transition-colors btn-xs"
+                    className="w-8 h-8 rounded-xl glass flex items-center justify-center text-muted-foreground hover:text-destructive transition-colors btn-xs"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>

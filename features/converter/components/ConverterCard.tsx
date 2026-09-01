@@ -90,7 +90,7 @@ export function ConverterCard() {
         <div className="flex items-center gap-2">
           <span className="text-sm font-bold text-foreground">USD ↔ MXN</span>
           <span className="flex items-center gap-1 text-[11px] text-muted-foreground">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />
             En vivo
           </span>
         </div>

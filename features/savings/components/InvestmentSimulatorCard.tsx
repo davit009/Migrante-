@@ -62,8 +62,8 @@ export function InvestmentSimulatorCard({ amountUSD }: InvestmentSimulatorCardPr
       label: 'CETES a 28 días',
       hint: `${(cetes.tasaAnual * 100).toFixed(2)}% anual`,
       icon: Landmark,
-      color: 'text-emerald-600 dark:text-emerald-400',
-      bg: 'bg-emerald-500/10',
+      color: 'text-success',
+      bg: 'bg-success/10',
       value: formatUSD(cetesProjection),
       note: 'Proyectado a 12 meses reinvirtiendo',
     },
@@ -71,8 +71,8 @@ export function InvestmentSimulatorCard({ amountUSD }: InvestmentSimulatorCardPr
       label: 'Bitcoin',
       hint: formatUSD(bitcoin.precioUSD),
       icon: Bitcoin,
-      color: 'text-amber-600 dark:text-amber-400',
-      bg: 'bg-amber-500/10',
+      color: 'text-warning',
+      bg: 'bg-warning/10',
       value: btcProjection !== null ? formatUSD(btcProjection) : '—',
       note:
         btcProjection !== null
@@ -120,9 +120,9 @@ export function InvestmentSimulatorCard({ amountUSD }: InvestmentSimulatorCardPr
         </Badge>
       )}
 
-      <div className="flex items-start gap-2 rounded-2xl bg-amber-500/10 border border-amber-500/20 px-3.5 py-2.5">
-        <AlertTriangle className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
-        <p className="text-[10px] text-amber-800 dark:text-amber-300 leading-relaxed">
+      <div className="flex items-start gap-2 rounded-2xl bg-warning/10 border border-warning/20 px-3.5 py-2.5">
+        <AlertTriangle className="w-3.5 h-3.5 text-warning shrink-0 mt-0.5" />
+        <p className="text-[10px] text-[oklch(0.42_0.09_75)] dark:text-[oklch(0.82_0.09_75)] leading-relaxed">
           Simulación <strong>educativa</strong>, no es asesoría de inversión. CETES es de renta fija del Gobierno de
           México, sujeto a cambio en cada subasta. Bitcoin es altamente volátil — su desempeño pasado no garantiza
           resultados futuros.

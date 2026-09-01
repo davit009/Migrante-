@@ -50,8 +50,8 @@ export function SuggestedSavingsCard({
       pct: '50%',
       amount: necesidades,
       icon: Home,
-      color: 'text-sky-600 dark:text-sky-400',
-      bg: 'bg-sky-500/10',
+      color: 'text-info',
+      bg: 'bg-info/10',
     },
     {
       label: 'Gastos personales',
@@ -59,8 +59,8 @@ export function SuggestedSavingsCard({
       pct: '30%',
       amount: gastosPersonales,
       icon: ShoppingBag,
-      color: 'text-amber-600 dark:text-amber-400',
-      bg: 'bg-amber-500/10',
+      color: 'text-warning',
+      bg: 'bg-warning/10',
     },
     {
       label: 'Ahorro',
@@ -68,8 +68,8 @@ export function SuggestedSavingsCard({
       pct: '20%',
       amount: ahorro,
       icon: PiggyBank,
-      color: 'text-emerald-600 dark:text-emerald-400',
-      bg: 'bg-emerald-500/10',
+      color: 'text-success',
+      bg: 'bg-success/10',
     },
   ];
 
