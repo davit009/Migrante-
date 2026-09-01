@@ -28,6 +28,8 @@ interface Item {
   cantidad: number;
 }
 
+const DRAFT_KEY = 'migrante_calculator_draft';
+
 export default function CalculatorPage() {
   const { rate } = useExchangeRate();
   const { isAuthenticated, profile } = useAuth();
@@ -51,6 +53,35 @@ export default function CalculatorPage() {
       setSelectedState(profile.estado_usa);
     }
   }, [profile?.estado_usa]);
+
+  // Restaurar borrador local: si el sistema cerró la app por falta de RAM
+  // mientras armabas la lista, se recupera al volver a abrirla.
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(DRAFT_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setItems(parsed);
+        }
+      }
+    } catch {
+      // localStorage puede fallar en modo privado; no es crítico
+    }
+  }, []);
+
+  // Guardar la lista como borrador local en cada cambio
+  useEffect(() => {
+    try {
+      if (items.length > 0) {
+        localStorage.setItem(DRAFT_KEY, JSON.stringify(items));
+      } else {
+        localStorage.removeItem(DRAFT_KEY);
+      }
+    } catch {
+      // localStorage puede fallar en modo privado; no es crítico
+    }
+  }, [items]);
 
   // Cálculos de la lista
   const subtotal = items.reduce((sum, item) => sum + item.precio * item.cantidad, 0);
@@ -129,6 +160,7 @@ export default function CalculatorPage() {
       });
 
       toast.success('Lista de compras guardada en tu historial');
+      setItems([]);
       router.push('/history');
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Error al guardar la lista');
