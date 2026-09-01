@@ -5,6 +5,7 @@ import { QuickConvertCard } from '@/features/converter/components/QuickConvertCa
 export const metadata: Metadata = {
   title: 'Conversión Rápida | Migrante$',
   description: 'Convierte USD a MXN al instante, con impuesto opcional de un tap.',
+  manifest: '/manifest-rapido.json',
 };
 
 export default function RapidoPage() {
