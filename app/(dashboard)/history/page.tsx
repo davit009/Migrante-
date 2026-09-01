@@ -169,7 +169,7 @@ export default function HistoryPage() {
                   </div>
 
                   <div className="text-right">
-                    <p className={`font-bold text-sm tabular ${isIncome ? 'text-emerald-600' : 'text-rose-600'}`}>
+                    <p className={`font-bold text-sm tabular ${isIncome ? 'text-success' : 'text-destructive'}`}>
                       {isIncome ? '+' : '-'}{formatUSD(tx.monto)}
                     </p>
                     <p className="text-[11px] text-muted-foreground tabular">

@@ -43,7 +43,7 @@ export function Navbar() {
               {isFetching ? (
                 <RefreshCw className="w-3 h-3 animate-spin" />
               ) : (
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />
               )}
               {formatRate(rate)} MXN
             </button>

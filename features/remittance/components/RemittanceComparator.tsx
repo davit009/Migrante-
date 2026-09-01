@@ -42,9 +42,9 @@ export function RemittanceComparator() {
       </div>
 
       {/* Disclaimer */}
-      <div className="flex items-start gap-2 rounded-2xl bg-amber-500/10 border border-amber-500/20 px-4 py-3">
-        <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
-        <p className="text-[11px] text-amber-800 dark:text-amber-300 leading-relaxed">
+      <div className="flex items-start gap-2 rounded-2xl bg-warning/10 border border-warning/20 px-4 py-3">
+        <AlertTriangle className="w-4 h-4 text-warning shrink-0 mt-0.5" />
+        <p className="text-[11px] text-[oklch(0.42_0.09_75)] dark:text-[oklch(0.82_0.09_75)] leading-relaxed">
           Valores <strong>estimados de referencia</strong>, no cotizaciones en vivo. Las comisiones y tasas reales
           varían según el monto, destino y promociones vigentes — confirma siempre en la app o sitio oficial del
           proveedor antes de enviar dinero.

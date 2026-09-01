@@ -97,7 +97,7 @@ export function CategoryBudgetsSection({
             const isOver = limiteUSD !== null && totalUSD >= limiteUSD;
             const isNear = limiteUSD !== null && !isOver && pct >= 0.7;
 
-            const barColor = limiteUSD === null ? 'bg-primary/50' : isOver ? 'bg-rose-500' : isNear ? 'bg-amber-500' : 'bg-emerald-500';
+            const barColor = limiteUSD === null ? 'bg-primary/50' : isOver ? 'bg-destructive' : isNear ? 'bg-warning' : 'bg-success';
 
             return (
               <div key={categoria} className="space-y-1.5">

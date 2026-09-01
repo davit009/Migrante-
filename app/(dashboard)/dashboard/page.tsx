@@ -135,7 +135,7 @@ export default function DashboardPage() {
 
               <Link href="/remesas">
                 <div className="glass rounded-3xl p-3 flex flex-col gap-2 glass-hover">
-                  <div className="w-8 h-8 rounded-xl bg-sky-500/10 text-sky-600 dark:text-sky-400 flex items-center justify-center">
+                  <div className="w-8 h-8 rounded-xl bg-info/10 text-info flex items-center justify-center">
                     <Send className="w-3.5 h-3.5" />
                   </div>
                   <div>
@@ -204,7 +204,7 @@ export default function DashboardPage() {
                       <div className="text-right shrink-0">
                         <p
                           className={`font-bold text-xs finance-number ${
-                            isIncome ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'
+                            isIncome ? 'text-success' : 'text-destructive'
                           }`}
                         >
                           {isIncome ? '+' : '-'}{formatUSD(item.monto)}

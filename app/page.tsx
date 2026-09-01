@@ -96,8 +96,8 @@ export default function HomePage() {
 
           {/* Ahorros */}
           <div className="glass rounded-3xl p-5 space-y-3 glass-hover">
-            <div className="w-11 h-11 rounded-2xl bg-emerald-500/10 flex items-center justify-center">
-              <PiggyBank className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+            <div className="w-11 h-11 rounded-2xl bg-success/10 flex items-center justify-center">
+              <PiggyBank className="w-5 h-5 text-success" />
             </div>
             <div>
               <h3 className="font-bold text-foreground">Control de Ahorros</h3>
@@ -114,8 +114,8 @@ export default function HomePage() {
 
           {/* Remesas */}
           <div className="glass rounded-3xl p-5 space-y-3 glass-hover">
-            <div className="w-11 h-11 rounded-2xl bg-sky-500/10 flex items-center justify-center">
-              <Send className="w-5 h-5 text-sky-600 dark:text-sky-400" />
+            <div className="w-11 h-11 rounded-2xl bg-info/10 flex items-center justify-center">
+              <Send className="w-5 h-5 text-info" />
             </div>
             <div>
               <h3 className="font-bold text-foreground">Comparador de Envío</h3>

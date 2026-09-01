@@ -82,7 +82,7 @@ export function TransactionForm({ onSubmit, isSubmitting }: TransactionFormProps
             }}
             className={`px-3 py-1 text-xs font-semibold rounded-lg transition-all ${
               tipo === 'gasto'
-                ? 'bg-rose-500 text-white shadow-sm'
+                ? 'bg-destructive text-white shadow-sm'
                 : 'text-muted-foreground hover:text-foreground'
             }`}
           >
@@ -97,7 +97,7 @@ export function TransactionForm({ onSubmit, isSubmitting }: TransactionFormProps
             }}
             className={`px-3 py-1 text-xs font-semibold rounded-lg transition-all ${
               tipo === 'ingreso'
-                ? 'bg-emerald-600 text-white shadow-sm'
+                ? 'bg-success text-white shadow-sm'
                 : 'text-muted-foreground hover:text-foreground'
             }`}
           >
@@ -186,7 +186,7 @@ export function TransactionForm({ onSubmit, isSubmitting }: TransactionFormProps
           type="submit"
           disabled={isSubmitting}
           className={`w-full h-11 rounded-2xl font-semibold text-white gap-2 shadow-sm ${
-            tipo === 'ingreso' ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-rose-600 hover:bg-rose-700'
+            tipo === 'ingreso' ? 'bg-success hover:bg-success/90' : 'bg-destructive hover:bg-destructive/90'
           }`}
         >
           <Plus className="w-4 h-4" />
