@@ -23,3 +23,21 @@ export interface InternalExchangeRateResponse {
   fuente: 'cache_db' | 'api_external';
   time_last_update_utc?: string;
 }
+
+// ─── Simulador de Inversión (CETES + Bitcoin) ────────────────
+export interface InvestmentRatesResponse {
+  cetes: {
+    /** Tasa de rendimiento anualizada de CETES 28 días, en decimal (ej. 0.105 = 10.5%) */
+    tasaAnual: number;
+    /** true si la tasa viene en vivo de Banxico; false si es el valor de referencia estático */
+    esEnVivo: boolean;
+    fecha: string;
+  };
+  bitcoin: {
+    precioUSD: number;
+    /** Variación porcentual en el último año (decimal, ej. 0.42 = +42%) */
+    variacion1AnioPct: number | null;
+    esEnVivo: boolean;
+    fecha: string;
+  };
+}

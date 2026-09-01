@@ -7,49 +7,101 @@
 
 import { useState } from 'react';
 import { useSavings } from '@/features/savings/hooks/useSavings';
+import { useSavingsGoals } from '@/features/savings/hooks/useSavingsGoals';
 import { useExchangeRate } from '@/features/converter/hooks/useExchangeRate';
 import { TransactionForm } from '@/features/savings/components/TransactionForm';
+import { SuggestedSavingsCard } from '@/features/savings/components/SuggestedSavingsCard';
+import { SavingsGoalsSection } from '@/features/savings/components/SavingsGoalsSection';
+import { InvestmentSimulatorCard } from '@/features/savings/components/InvestmentSimulatorCard';
+import { CategoryBudgetsSection } from '@/features/savings/components/CategoryBudgetsSection';
+import { useCategoryBudgets } from '@/features/savings/hooks/useCategoryBudgets';
 import { formatUSD, formatMXN } from '@/utils/currency.utils';
-import { formatDateShort } from '@/utils/date.utils';
+import { formatDateShort, getTodayISO, getMonthKey, formatMonthLabel } from '@/utils/date.utils';
+import { calculateSuggestedBudget } from '@/utils/budget.utils';
 import { getCategoryByValue } from '@/constants/categories';
 
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { PiggyBank, TrendingUp, TrendingDown, Trash2, Filter } from 'lucide-react';
+import { MonthSelector } from '@/components/layout/MonthSelector';
+import { PiggyBank, TrendingUp, TrendingDown, Trash2 } from 'lucide-react';
 
 export default function SavingsPage() {
+  const [selectedMonth, setSelectedMonth] = useState(getMonthKey());
+
   const { rate } = useExchangeRate();
-  const { 
-    transactions, 
-    totalIngresosUSD, 
-    totalGastosUSD, 
-    balanceUSD, 
+  const {
+    transactions,
+    totalIngresosUSD,
+    totalGastosUSD,
+    balanceUSD,
     balanceMXN,
     addTransaction,
     deleteTransaction,
     isSubmitting,
-    isLoading 
-  } = useSavings();
+    isLoading
+  } = useSavings(selectedMonth);
+
+  const {
+    goals,
+    isLoading: isGoalsLoading,
+    createGoal,
+    isCreating: isCreatingGoal,
+    contribute,
+    isContributing,
+    deleteGoal,
+  } = useSavingsGoals();
+
+  const {
+    budgets,
+    isLoading: isBudgetsLoading,
+    upsertBudget,
+    isSaving: isSavingBudget,
+  } = useCategoryBudgets();
 
   const [filterType, setFilterType] = useState<'todos' | 'ingreso' | 'gasto'>('todos');
+  const [isRegisteringSavings, setIsRegisteringSavings] = useState(false);
 
   const filteredTransactions = transactions.filter((t) => {
     if (filterType === 'todos') return true;
     return t.tipo === filterType;
   });
 
+  const handleRegisterSuggestedSavings = async () => {
+    const { ahorro } = calculateSuggestedBudget(totalIngresosUSD);
+    if (ahorro <= 0) return;
+
+    try {
+      setIsRegisteringSavings(true);
+      await addTransaction({
+        tipo: 'gasto',
+        categoria: 'ahorro',
+        descripcion: 'Ahorro sugerido (regla 50/30/20)',
+        monto: ahorro,
+        moneda: 'USD',
+        fecha: getTodayISO(),
+      });
+    } catch {
+      // El hook useSavings ya muestra el toast de error
+    } finally {
+      setIsRegisteringSavings(false);
+    }
+  };
+
   return (
     <div className="space-y-8 max-w-4xl mx-auto py-2">
       {/* Header Módulo */}
-      <div>
-        <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground flex items-center gap-2.5">
-          <PiggyBank className="w-7 h-7 text-emerald-600 dark:text-emerald-400" />
-          Control de Ahorros
-        </h1>
-        <p className="text-sm text-muted-foreground mt-1">
-          Administra tus ingresos y gastos para medir tu capacidad de ahorro mensual en USD y MXN.
-        </p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground flex items-center gap-2.5">
+            <PiggyBank className="w-7 h-7 text-emerald-600 dark:text-emerald-400" />
+            Control de Ahorros
+          </h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            Administra tus ingresos y gastos para medir tu capacidad de ahorro mensual en USD y MXN.
+          </p>
+        </div>
+        <MonthSelector monthKey={selectedMonth} onChange={setSelectedMonth} />
       </div>
 
       {/* Resumen de Ahorro / Balance */}
@@ -86,6 +138,39 @@ export default function SavingsPage() {
         </Card>
       </div>
 
+      {/* Plan de Ahorro Sugerido */}
+      <SuggestedSavingsCard
+        incomeUSD={totalIngresosUSD}
+        rate={rate || 17.5}
+        onRegisterSavings={handleRegisterSuggestedSavings}
+        isRegistering={isRegisteringSavings}
+        periodLabel={formatMonthLabel(selectedMonth)}
+      />
+
+      {/* Metas de Ahorro */}
+      <SavingsGoalsSection
+        goals={goals}
+        isLoading={isGoalsLoading}
+        onCreateGoal={createGoal}
+        isCreating={isCreatingGoal}
+        onContribute={(goal, amount) => contribute({ goal, amount })}
+        isContributing={isContributing}
+        onDelete={deleteGoal}
+      />
+
+      {/* Simulador de Inversión */}
+      <InvestmentSimulatorCard amountUSD={balanceUSD} />
+
+      {/* Gastos por Categoría + Presupuestos */}
+      <CategoryBudgetsSection
+        transactions={transactions}
+        rate={rate || 17.5}
+        budgets={budgets}
+        isLoadingBudgets={isBudgetsLoading}
+        onSaveBudget={(categoria, limite) => upsertBudget({ categoria, limite_mensual: limite, moneda: 'USD' })}
+        isSavingBudget={isSavingBudget}
+      />
+
       {/* Formulario + Lista de Movimientos */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         {/* Columna Izquierda: Formulario (5 Cols) */}
@@ -96,7 +181,7 @@ export default function SavingsPage() {
         {/* Columna Derecha: Lista de Transacciones (7 Cols) */}
         <div className="lg:col-span-7 space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="font-bold text-base text-foreground">Historial de Movimientos</h3>
+            <h3 className="font-bold text-base text-foreground">Movimientos de {formatMonthLabel(selectedMonth)}</h3>
 
             {/* Filtros */}
             <div className="flex items-center gap-1 bg-muted p-1 rounded-xl">

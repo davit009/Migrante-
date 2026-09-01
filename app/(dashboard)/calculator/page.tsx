@@ -222,7 +222,7 @@ export default function CalculatorPage() {
               placeholder="Ej: Camisa, Víveres..."
               value={newNombre}
               onChange={(e) => setNewNombre(e.target.value)}
-              className="h-11 rounded-2xl glass border-0 bg-transparent text-sm focus-visible:ring-1 focus-visible:ring-primary/30"
+              className="h-11 rounded-2xl glass border-0 bg-transparent focus-visible:ring-1 focus-visible:ring-primary/30"
             />
           </div>
 

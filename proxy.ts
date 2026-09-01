@@ -7,10 +7,10 @@ import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
 // Rutas públicas (accesibles sin registro/login)
-const PUBLIC_ROUTES = ['/', '/login', '/register', '/converter', '/calculator'];
+const PUBLIC_ROUTES = ['/', '/login', '/register', '/converter', '/calculator', '/remesas'];
 
 // Rutas públicas de API
-const PUBLIC_API_ROUTES = ['/api/exchange-rate'];
+const PUBLIC_API_ROUTES = ['/api/exchange-rate', '/api/keep-alive', '/api/auth/callback', '/api/investment-rates'];
 
 export async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
@@ -68,6 +68,6 @@ export default proxy;
 
 export const config = {
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|woff|woff2)$).*)',
+    '/((?!_next/static|_next/image|favicon.ico|manifest.json|.*\\.(?:svg|png|jpg|jpeg|gif|webp|woff|woff2|json)$).*)',
   ],
 };

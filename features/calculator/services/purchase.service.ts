@@ -28,7 +28,7 @@ export const purchaseService = {
 
     // 1. Crear la cabecera de la lista de compra
     const { data: list, error: listError } = await supabase
-      .from('purchase_lists')
+      .from('migrante_purchase_lists')
       .insert({
         user_id: user.id,
         nombre: params.nombre || `Compra (${params.estado_usa})`,
@@ -55,7 +55,7 @@ export const purchaseService = {
     }));
 
     const { error: itemsError } = await supabase
-      .from('purchase_items')
+      .from('migrante_purchase_items')
       .insert(itemsToInsert);
 
     if (itemsError) throw new Error(`Error al guardar productos: ${itemsError.message}`);
@@ -69,8 +69,8 @@ export const purchaseService = {
   async getPurchaseLists(): Promise<PurchaseList[]> {
     const supabase = createClient();
     const { data, error } = await supabase
-      .from('purchase_lists')
-      .select('*, items:purchase_items(*)')
+      .from('migrante_purchase_lists')
+      .select('*, items:migrante_purchase_items(*)')
       .order('created_at', { ascending: false });
 
     if (error) throw new Error(`Error al consultar compras: ${error.message}`);

@@ -58,6 +58,43 @@ export function getCurrentMonthName(): string {
 }
 
 /**
+ * Devuelve la clave de mes YYYY-MM para una fecha dada (por defecto, hoy).
+ * @example getMonthKey() → "2026-08"
+ */
+export function getMonthKey(date: Date = new Date()): string {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+}
+
+/**
+ * Desplaza una clave de mes YYYY-MM hacia adelante o atrás.
+ * @example shiftMonthKey('2026-01', -1) → '2025-12'
+ */
+export function shiftMonthKey(monthKey: string, delta: number): string {
+  const [year, month] = monthKey.split('-').map(Number);
+  return getMonthKey(new Date(year, month - 1 + delta, 1));
+}
+
+/**
+ * Formatea una clave de mes YYYY-MM a texto legible en español.
+ * @example formatMonthLabel('2026-08') → "Agosto 2026"
+ */
+export function formatMonthLabel(monthKey: string): string {
+  const [year, month] = monthKey.split('-').map(Number);
+  const label = new Date(year, month - 1, 1).toLocaleDateString('es-MX', {
+    month: 'long',
+    year: 'numeric',
+  });
+  return label.charAt(0).toUpperCase() + label.slice(1);
+}
+
+/**
+ * true si la clave de mes YYYY-MM corresponde al mes actual.
+ */
+export function isCurrentMonth(monthKey: string): boolean {
+  return monthKey === getMonthKey();
+}
+
+/**
  * Formatea una fecha ISO con hora (timestamp).
  * @example formatDateTime('2024-03-15T14:30:00Z') → "15 mar. 2024, 2:30 p.m."
  */

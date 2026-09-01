@@ -13,7 +13,7 @@ export const transactionService = {
   async getTransactions(): Promise<Transaction[]> {
     const supabase = createClient();
     const { data, error } = await supabase
-      .from('transactions')
+      .from('migrante_transactions')
       .select('*')
       .order('fecha', { ascending: false });
 
@@ -40,7 +40,7 @@ export const transactionService = {
         : payload.monto;
 
     const { data, error } = await supabase
-      .from('transactions')
+      .from('migrante_transactions')
       .insert({
         user_id: user.id,
         tipo: payload.tipo,
@@ -68,7 +68,7 @@ export const transactionService = {
   async deleteTransaction(id: string): Promise<void> {
     const supabase = createClient();
     const { error } = await supabase
-      .from('transactions')
+      .from('migrante_transactions')
       .delete()
       .eq('id', id);
 

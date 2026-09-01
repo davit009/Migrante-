@@ -20,12 +20,24 @@ export type TransactionType = 'ingreso' | 'gasto';
 
 export type TransactionCategory =
   | 'trabajo'
-  | 'gasolina'
-  | 'supermercado'
+  | 'freelance'
+  | 'negocio'
+  | 'propinas'
+  | 'remesa'
   | 'renta'
+  | 'supermercado'
   | 'comida'
-  | 'ropa'
+  | 'gasolina'
+  | 'transporte'
   | 'salud'
+  | 'ropa'
+  | 'servicios'
+  | 'telefono'
+  | 'entretenimiento'
+  | 'envio'
+  | 'educacion'
+  | 'seguros'
+  | 'ahorro'
   | 'otros';
 
 export interface Transaction {
@@ -110,6 +122,46 @@ export interface ConversionResult {
   tipo_cambio: number;
   modo: ConversionMode;
   fecha: string;
+}
+
+// ─── Metas de Ahorro ─────────────────────────────────────────
+export type GoalStatus = 'activa' | 'completada' | 'cancelada';
+
+export interface SavingsGoal {
+  id: string;
+  user_id: string;
+  nombre: string;
+  monto_objetivo: number;
+  monto_actual: number;
+  moneda: 'USD' | 'MXN';
+  fecha_limite: string | null;
+  estado: GoalStatus;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface SavingsGoalCreate {
+  nombre: string;
+  monto_objetivo: number;
+  moneda: 'USD' | 'MXN';
+  fecha_limite?: string | null;
+}
+
+// ─── Presupuestos por Categoría ──────────────────────────────
+export interface CategoryBudget {
+  id: string;
+  user_id: string;
+  categoria: string;
+  limite_mensual: number;
+  moneda: 'USD' | 'MXN';
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CategoryBudgetUpsert {
+  categoria: string;
+  limite_mensual: number;
+  moneda: 'USD' | 'MXN';
 }
 
 // ─── Dashboard ───────────────────────────────────────────────

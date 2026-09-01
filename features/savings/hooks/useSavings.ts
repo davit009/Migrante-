@@ -11,13 +11,17 @@ import { useExchangeRate } from '@/features/converter/hooks/useExchangeRate';
 import type { TransactionCreate } from '@/types/app.types';
 import { toast } from 'sonner';
 
-export function useSavings() {
+/**
+ * @param monthKey - Filtra las transacciones (y totales) a un mes YYYY-MM.
+ *                    Si se omite, se consideran todas las transacciones.
+ */
+export function useSavings(monthKey?: string) {
   const queryClient = useQueryClient();
   const { rate } = useExchangeRate();
 
   // Consulta de transacciones
   const {
-    data: transactions = [],
+    data: allTransactions = [],
     isLoading,
     isError,
     error,
@@ -26,6 +30,10 @@ export function useSavings() {
     queryKey: ['transactions'],
     queryFn: () => transactionService.getTransactions(),
   });
+
+  const transactions = monthKey
+    ? allTransactions.filter((t) => t.fecha.startsWith(monthKey))
+    : allTransactions;
 
   // Mutación para agregar transacción
   const createMutation = useMutation({
@@ -66,6 +74,7 @@ export function useSavings() {
 
   return {
     transactions,
+    allTransactions,
     totalIngresosUSD,
     totalGastosUSD,
     balanceUSD,
