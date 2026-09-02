@@ -5,7 +5,8 @@
 // Formulario para registrar un pago (nómina W-2 o cliente 1099)
 // ============================================================
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useAuth } from '@/features/auth/hooks/useAuth';
 import { USA_STATES_LIST } from '@/constants/usa-states';
 import { getTodayISO } from '@/utils/date.utils';
 import type { PayrollEntryCreate, WorkerType } from '@/types/app.types';
@@ -20,16 +21,22 @@ import { Plus } from 'lucide-react';
 interface PayrollEntryFormProps {
   onSubmit: (values: PayrollEntryCreate) => Promise<unknown>;
   isSubmitting: boolean;
-  defaultState?: string;
 }
 
-export function PayrollEntryForm({ onSubmit, isSubmitting, defaultState = 'TX' }: PayrollEntryFormProps) {
+export function PayrollEntryForm({ onSubmit, isSubmitting }: PayrollEntryFormProps) {
+  const { profile } = useAuth();
   const [tipoTrabajador, setTipoTrabajador] = useState<WorkerType>('w2');
-  const [estadoUsa, setEstadoUsa] = useState(defaultState);
+  const [estadoUsa, setEstadoUsa] = useState('TX');
   const [montoBruto, setMontoBruto] = useState('');
   const [retencionFederal, setRetencionFederal] = useState('');
   const [retencionEstatal, setRetencionEstatal] = useState('');
   const [fecha, setFecha] = useState(getTodayISO());
+
+  useEffect(() => {
+    if (profile?.estado_usa) {
+      setEstadoUsa(profile.estado_usa);
+    }
+  }, [profile?.estado_usa]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
