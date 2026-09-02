@@ -291,3 +291,34 @@ CREATE TRIGGER update_category_budgets_updated_at
   BEFORE UPDATE ON public.migrante_category_budgets
   FOR EACH ROW
   EXECUTE PROCEDURE migrante_update_updated_at_column();
+
+
+-- 10. TABLA: migrante_payroll_entries (Pagos de nómina/autoempleo para el estimador de impuestos)
+CREATE TABLE IF NOT EXISTS public.migrante_payroll_entries (
+  id                       UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id                  UUID NOT NULL REFERENCES public.migrante_profiles(id) ON DELETE CASCADE,
+  fecha                    DATE NOT NULL,
+  tipo_trabajador          TEXT NOT NULL CHECK (tipo_trabajador IN ('w2', '1099')),
+  estado_usa               TEXT NOT NULL,
+  monto_bruto              NUMERIC(12, 2) NOT NULL CHECK (monto_bruto > 0),
+  retencion_federal_real   NUMERIC(12, 2),
+  retencion_estatal_real   NUMERIC(12, 2),
+  created_at               TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at               TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_migrante_payroll_entries_user_id ON public.migrante_payroll_entries(user_id);
+
+-- RLS para migrante_payroll_entries
+ALTER TABLE public.migrante_payroll_entries ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Los usuarios administran sus pagos de nómina" ON public.migrante_payroll_entries;
+CREATE POLICY "Los usuarios administran sus pagos de nómina"
+  ON public.migrante_payroll_entries FOR ALL
+  USING (auth.uid() = user_id);
+
+DROP TRIGGER IF EXISTS update_payroll_entries_updated_at ON public.migrante_payroll_entries;
+CREATE TRIGGER update_payroll_entries_updated_at
+  BEFORE UPDATE ON public.migrante_payroll_entries
+  FOR EACH ROW
+  EXECUTE PROCEDURE migrante_update_updated_at_column();

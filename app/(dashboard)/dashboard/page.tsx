@@ -24,7 +24,8 @@ import {
   Calculator,
   PiggyBank,
   ArrowRight,
-  Send
+  Send,
+  Receipt
 } from 'lucide-react';
 
 export default function DashboardPage() {
@@ -108,7 +109,7 @@ export default function DashboardPage() {
             <h2 className="text-base font-bold tracking-tight text-foreground px-1">
               Herramientas
             </h2>
-            <div className="grid grid-cols-3 gap-2.5">
+            <div className="grid grid-cols-2 gap-2.5">
               <Link href="/calculator">
                 <div className="glass rounded-3xl p-3 flex flex-col gap-2 glass-hover">
                   <div className="w-8 h-8 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
@@ -141,6 +142,18 @@ export default function DashboardPage() {
                   <div>
                     <span className="font-bold text-[11px] text-foreground block leading-tight">Remesas</span>
                     <span className="text-[9px] text-muted-foreground">Comparar envíos</span>
+                  </div>
+                </div>
+              </Link>
+
+              <Link href="/impuestos">
+                <div className="glass rounded-3xl p-3 flex flex-col gap-2 glass-hover">
+                  <div className="w-8 h-8 rounded-xl bg-warning/10 text-warning flex items-center justify-center">
+                    <Receipt className="w-3.5 h-3.5" />
+                  </div>
+                  <div>
+                    <span className="font-bold text-[11px] text-foreground block leading-tight">Impuestos</span>
+                    <span className="text-[9px] text-muted-foreground">Nómina y retención</span>
                   </div>
                 </div>
               </Link>
