@@ -23,6 +23,7 @@ import { getCategoryByValue } from '@/constants/categories';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { MonthSelector } from '@/components/layout/MonthSelector';
 import { PiggyBank, TrendingUp, TrendingDown, Trash2 } from 'lucide-react';
 
@@ -98,7 +99,7 @@ export default function SavingsPage() {
             Control de Ahorros
           </h1>
           <p className="text-sm text-muted-foreground mt-1">
-            Administra tus ingresos y gastos para medir tu capacidad de ahorro mensual en USD y MXN.
+            Tu capacidad de ahorro del mes, en USD y MXN.
           </p>
         </div>
         <MonthSelector monthKey={selectedMonth} onChange={setSelectedMonth} />
@@ -138,134 +139,146 @@ export default function SavingsPage() {
         </Card>
       </div>
 
-      {/* Plan de Ahorro Sugerido */}
-      <SuggestedSavingsCard
-        incomeUSD={totalIngresosUSD}
-        rate={rate || 17.5}
-        onRegisterSavings={handleRegisterSuggestedSavings}
-        isRegistering={isRegisteringSavings}
-        periodLabel={formatMonthLabel(selectedMonth)}
-      />
+      <Tabs defaultValue="movimientos" className="space-y-6">
+        <TabsList className="grid grid-cols-2 w-full max-w-sm h-11 rounded-2xl bg-muted p-1">
+          <TabsTrigger value="movimientos" className="rounded-xl font-semibold text-xs sm:text-sm">
+            Movimientos
+          </TabsTrigger>
+          <TabsTrigger value="herramientas" className="rounded-xl font-semibold text-xs sm:text-sm">
+            Metas y Presupuesto
+          </TabsTrigger>
+        </TabsList>
 
-      {/* Metas de Ahorro */}
-      <SavingsGoalsSection
-        goals={goals}
-        isLoading={isGoalsLoading}
-        onCreateGoal={createGoal}
-        isCreating={isCreatingGoal}
-        onContribute={(goal, amount) => contribute({ goal, amount })}
-        isContributing={isContributing}
-        onDelete={deleteGoal}
-      />
+        {/* Movimientos: lo esencial, visible siempre */}
+        <TabsContent value="movimientos" className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            {/* Columna Izquierda: Formulario (5 Cols) */}
+            <div className="lg:col-span-5">
+              <TransactionForm onSubmit={addTransaction} isSubmitting={isSubmitting} />
+            </div>
 
-      {/* Simulador de Inversión */}
-      <InvestmentSimulatorCard amountUSD={balanceUSD} />
+            {/* Columna Derecha: Lista de Transacciones (7 Cols) */}
+            <div className="lg:col-span-7 space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="font-bold text-base text-foreground">{formatMonthLabel(selectedMonth)}</h3>
 
-      {/* Gastos por Categoría + Presupuestos */}
-      <CategoryBudgetsSection
-        transactions={transactions}
-        rate={rate || 17.5}
-        budgets={budgets}
-        isLoadingBudgets={isBudgetsLoading}
-        onSaveBudget={(categoria, limite) => upsertBudget({ categoria, limite_mensual: limite, moneda: 'USD' })}
-        isSavingBudget={isSavingBudget}
-      />
+                {/* Filtros */}
+                <div className="flex items-center gap-1 bg-muted p-1 rounded-xl">
+                  {(['todos', 'ingreso', 'gasto'] as const).map((t) => (
+                    <button
+                      key={t}
+                      onClick={() => setFilterType(t)}
+                      className={`px-2.5 py-1 text-xs font-medium rounded-lg capitalize transition-all ${
+                        filterType === t
+                          ? 'bg-card text-foreground shadow-sm font-semibold'
+                          : 'text-muted-foreground hover:text-foreground'
+                      }`}
+                    >
+                      {t}
+                    </button>
+                  ))}
+                </div>
+              </div>
 
-      {/* Formulario + Lista de Movimientos */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        {/* Columna Izquierda: Formulario (5 Cols) */}
-        <div className="lg:col-span-5">
-          <TransactionForm onSubmit={addTransaction} isSubmitting={isSubmitting} />
-        </div>
+              {isLoading ? (
+                <div className="space-y-2">
+                  {[1, 2, 3, 4].map((i) => (
+                    <div key={i} className="h-16 rounded-2xl bg-muted animate-pulse" />
+                  ))}
+                </div>
+              ) : filteredTransactions.length === 0 ? (
+                <Card className="p-8 rounded-2xl border-dashed border-border bg-card/40 text-center text-xs text-muted-foreground">
+                  No hay movimientos en esta categoría. Registra uno en el formulario.
+                </Card>
+              ) : (
+                <div className="space-y-2">
+                  {filteredTransactions.map((tx) => {
+                    const cat = getCategoryByValue(tx.categoria);
+                    const isIncome = tx.tipo === 'ingreso';
 
-        {/* Columna Derecha: Lista de Transacciones (7 Cols) */}
-        <div className="lg:col-span-7 space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="font-bold text-base text-foreground">Movimientos de {formatMonthLabel(selectedMonth)}</h3>
+                    return (
+                      <Card key={tx.id} className="p-4 rounded-2xl border-border bg-card flex items-center justify-between gap-3 card-hover">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="w-10 h-10 rounded-2xl bg-muted flex items-center justify-center text-xl shrink-0">
+                            {cat?.emoji ?? '📌'}
+                          </div>
+                          <div className="min-w-0">
+                            <p className="font-semibold text-sm text-foreground truncate">
+                              {tx.descripcion || cat?.label || 'Movimiento'}
+                            </p>
+                            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                              <Badge variant="outline" className="text-[10px] px-1.5 py-0 rounded-md">
+                                {cat?.label}
+                              </Badge>
+                              <span>{formatDateShort(tx.fecha)}</span>
+                            </div>
+                          </div>
+                        </div>
 
-            {/* Filtros */}
-            <div className="flex items-center gap-1 bg-muted p-1 rounded-xl">
-              {(['todos', 'ingreso', 'gasto'] as const).map((t) => (
-                <button
-                  key={t}
-                  onClick={() => setFilterType(t)}
-                  className={`px-2.5 py-1 text-xs font-medium rounded-lg capitalize transition-all ${
-                    filterType === t
-                      ? 'bg-card text-foreground shadow-sm font-semibold'
-                      : 'text-muted-foreground hover:text-foreground'
-                  }`}
-                >
-                  {t}
-                </button>
-              ))}
+                        <div className="flex items-center gap-3 shrink-0">
+                          <div className="text-right">
+                            <p
+                              className={`font-bold text-sm tabular ${
+                                isIncome ? 'text-success' : 'text-destructive'
+                              }`}
+                            >
+                              {isIncome ? '+' : '-'}{formatUSD(tx.monto)}
+                            </p>
+                            <p className="text-[10px] text-muted-foreground tabular">
+                              ≈ {formatMXN(tx.monto_mxn ?? tx.monto * (rate || 17.5))}
+                            </p>
+                          </div>
+
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => deleteTransaction(tx.id)}
+                            className="w-8 h-8 rounded-xl text-muted-foreground hover:text-destructive"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </Card>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           </div>
+        </TabsContent>
 
-          {isLoading ? (
-            <div className="space-y-2">
-              {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="h-16 rounded-2xl bg-muted animate-pulse" />
-              ))}
-            </div>
-          ) : filteredTransactions.length === 0 ? (
-            <Card className="p-8 rounded-2xl border-dashed border-border bg-card/40 text-center text-xs text-muted-foreground">
-              No hay movimientos en esta categoría. Registra uno en el formulario.
-            </Card>
-          ) : (
-            <div className="space-y-2">
-              {filteredTransactions.map((tx) => {
-                const cat = getCategoryByValue(tx.categoria);
-                const isIncome = tx.tipo === 'ingreso';
+        {/* Herramientas: plan sugerido, metas, inversión y presupuestos — opcional para quien quiera profundizar */}
+        <TabsContent value="herramientas" className="space-y-6">
+          <SuggestedSavingsCard
+            incomeUSD={totalIngresosUSD}
+            rate={rate || 17.5}
+            onRegisterSavings={handleRegisterSuggestedSavings}
+            isRegistering={isRegisteringSavings}
+            periodLabel={formatMonthLabel(selectedMonth)}
+          />
 
-                return (
-                  <Card key={tx.id} className="p-4 rounded-2xl border-border bg-card flex items-center justify-between gap-3 card-hover">
-                    <div className="flex items-center gap-3 min-w-0">
-                      <div className="w-10 h-10 rounded-2xl bg-muted flex items-center justify-center text-xl shrink-0">
-                        {cat?.emoji ?? '📌'}
-                      </div>
-                      <div className="min-w-0">
-                        <p className="font-semibold text-sm text-foreground truncate">
-                          {tx.descripcion || cat?.label || 'Movimiento'}
-                        </p>
-                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                          <Badge variant="outline" className="text-[10px] px-1.5 py-0 rounded-md">
-                            {cat?.label}
-                          </Badge>
-                          <span>{formatDateShort(tx.fecha)}</span>
-                        </div>
-                      </div>
-                    </div>
+          <SavingsGoalsSection
+            goals={goals}
+            isLoading={isGoalsLoading}
+            onCreateGoal={createGoal}
+            isCreating={isCreatingGoal}
+            onContribute={(goal, amount) => contribute({ goal, amount })}
+            isContributing={isContributing}
+            onDelete={deleteGoal}
+          />
 
-                    <div className="flex items-center gap-3 shrink-0">
-                      <div className="text-right">
-                        <p
-                          className={`font-bold text-sm tabular ${
-                            isIncome ? 'text-success' : 'text-destructive'
-                          }`}
-                        >
-                          {isIncome ? '+' : '-'}{formatUSD(tx.monto)}
-                        </p>
-                        <p className="text-[10px] text-muted-foreground tabular">
-                          ≈ {formatMXN(tx.monto_mxn ?? tx.monto * (rate || 17.5))}
-                        </p>
-                      </div>
+          <InvestmentSimulatorCard amountUSD={balanceUSD} />
 
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => deleteTransaction(tx.id)}
-                        className="w-8 h-8 rounded-xl text-muted-foreground hover:text-destructive"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </Card>
-                );
-              })}
-            </div>
-          )}
-        </div>
-      </div>
+          <CategoryBudgetsSection
+            transactions={transactions}
+            rate={rate || 17.5}
+            budgets={budgets}
+            isLoadingBudgets={isBudgetsLoading}
+            onSaveBudget={(categoria, limite) => upsertBudget({ categoria, limite_mensual: limite, moneda: 'USD' })}
+            isSavingBudget={isSavingBudget}
+          />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
