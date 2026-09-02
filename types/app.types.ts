@@ -164,6 +164,32 @@ export interface CategoryBudgetUpsert {
   moneda: 'USD' | 'MXN';
 }
 
+// ─── Impuestos de Nómina ──────────────────────────────────────
+export type WorkerType = 'w2' | '1099';
+export type FilingStatus = 'soltero' | 'casado_conjunto';
+
+export interface PayrollEntry {
+  id: string;
+  user_id: string;
+  fecha: string;
+  tipo_trabajador: WorkerType;
+  estado_usa: string;
+  monto_bruto: number;
+  retencion_federal_real: number | null;
+  retencion_estatal_real: number | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PayrollEntryCreate {
+  fecha: string;
+  tipo_trabajador: WorkerType;
+  estado_usa: string;
+  monto_bruto: number;
+  retencion_federal_real?: number | null;
+  retencion_estatal_real?: number | null;
+}
+
 // ─── Dashboard ───────────────────────────────────────────────
 export interface DashboardStats {
   balance_usd: number;
