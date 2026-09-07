@@ -12,6 +12,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
 
 import { loginSchema, type LoginFormValues } from '@/validators/auth.schema';
+import { getSafeRedirectPath } from '@/utils/safe-redirect.utils';
 import { useAuth } from '../hooks/useAuth';
 
 import { Button } from '@/components/ui/button';
@@ -24,7 +25,7 @@ export function LoginForm() {
   const { loginWithEmail } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const next = searchParams.get('next') || '/dashboard';
+  const next = getSafeRedirectPath(searchParams.get('next'));
 
   const {
     register,
