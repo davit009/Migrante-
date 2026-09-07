@@ -18,14 +18,16 @@ import { useCategoryBudgets } from '@/features/savings/hooks/useCategoryBudgets'
 import { formatUSD, formatMXN } from '@/utils/currency.utils';
 import { formatDateShort, getTodayISO, getMonthKey, formatMonthLabel } from '@/utils/date.utils';
 import { calculateSuggestedBudget } from '@/utils/budget.utils';
+import { groupExpensesByCategory } from '@/utils/category-spending.utils';
 import { getCategoryByValue } from '@/constants/categories';
+import { CategorySpendingBars } from '@/components/charts/CategorySpendingBars';
 
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { MonthSelector } from '@/components/layout/MonthSelector';
-import { PiggyBank, TrendingUp, TrendingDown, Trash2 } from 'lucide-react';
+import { PiggyBank, TrendingUp, TrendingDown, Trash2, ChartNoAxesColumnIncreasing } from 'lucide-react';
 
 export default function SavingsPage() {
   const [selectedMonth, setSelectedMonth] = useState(getMonthKey());
@@ -67,6 +69,8 @@ export default function SavingsPage() {
     if (filterType === 'todos') return true;
     return t.tipo === filterType;
   });
+
+  const categorySpending = groupExpensesByCategory(transactions, rate || 17.5);
 
   const handleRegisterSuggestedSavings = async () => {
     const { ahorro } = calculateSuggestedBudget(totalIngresosUSD);
@@ -151,6 +155,23 @@ export default function SavingsPage() {
 
         {/* Movimientos: lo esencial, visible siempre */}
         <TabsContent value="movimientos" className="space-y-6">
+          {categorySpending.length > 0 && (
+            <Card className="p-5 rounded-3xl border-border bg-card space-y-4">
+              <div>
+                <h3 className="font-bold text-sm text-foreground flex items-center gap-2">
+                  <ChartNoAxesColumnIncreasing className="w-4 h-4 text-primary" /> Gastos por Categoría
+                </h3>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  En qué se te fue el dinero este mes, de mayor a menor.
+                </p>
+              </div>
+              <CategorySpendingBars
+                items={categorySpending.map((c) => ({ categoria: c.categoria, amount: c.totalUSD }))}
+                formatAmount={formatUSD}
+              />
+            </Card>
+          )}
+
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             {/* Columna Izquierda: Formulario (5 Cols) */}
             <div className="lg:col-span-5">

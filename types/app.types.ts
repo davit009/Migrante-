@@ -164,6 +164,26 @@ export interface CategoryBudgetUpsert {
   moneda: 'USD' | 'MXN';
 }
 
+// ─── Modo México (ledger separado, solo MXN) ──────────────────
+export interface MxTransaction {
+  id: string;
+  user_id: string;
+  tipo: TransactionType;
+  categoria: TransactionCategory;
+  descripcion: string | null;
+  monto: number;
+  fecha: string;
+  created_at: string;
+}
+
+export interface MxTransactionCreate {
+  tipo: TransactionType;
+  categoria: TransactionCategory;
+  descripcion?: string;
+  monto: number;
+  fecha: string;
+}
+
 // ─── Impuestos de Nómina ──────────────────────────────────────
 export type WorkerType = 'w2' | '1099';
 export type FilingStatus = 'soltero' | 'casado_conjunto';

@@ -143,24 +143,44 @@ export default function DashboardPage() {
           </Link>
         </div>
 
-        {/* Acceso a Saldo Transporte — app aparte, con su propio diseño */}
-        <Link href="/transporte" className="block mt-2.5">
-          <div className="rounded-3xl border border-dashed border-border p-3.5 flex items-center gap-3 hover:border-primary/40 transition-colors">
-            <div className="w-9 h-9 rounded-xl bg-muted flex items-center justify-center text-lg shrink-0">
-              🚌
-            </div>
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-1.5">
-                <span className="font-bold text-xs text-foreground">Saldo Transporte</span>
-                <span className="text-[9px] font-semibold text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full">
-                  Otra app
-                </span>
+        {/* Accesos discretos: Saldo Transporte (app aparte) y Modo México (ledger aparte) */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mt-2.5">
+          <Link href="/transporte" className="block">
+            <div className="rounded-3xl border border-dashed border-border p-3.5 flex items-center gap-3 hover:border-primary/40 transition-colors h-full">
+              <div className="w-9 h-9 rounded-xl bg-muted flex items-center justify-center text-lg shrink-0">
+                🚌
               </div>
-              <span className="text-[10px] text-muted-foreground">Estima el saldo de tu tarjeta</span>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-1.5">
+                  <span className="font-bold text-xs text-foreground">Saldo Transporte</span>
+                  <span className="text-[9px] font-semibold text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full">
+                    Otra app
+                  </span>
+                </div>
+                <span className="text-[10px] text-muted-foreground">Estima el saldo de tu tarjeta</span>
+              </div>
+              <ArrowRight className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
             </div>
-            <ArrowRight className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-          </div>
-        </Link>
+          </Link>
+
+          <Link href="/mexico" className="block">
+            <div className="rounded-3xl border border-dashed border-border p-3.5 flex items-center gap-3 hover:border-primary/40 transition-colors h-full">
+              <div className="w-9 h-9 rounded-xl bg-muted flex items-center justify-center text-lg shrink-0">
+                🇲🇽
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-1.5">
+                  <span className="font-bold text-xs text-foreground">Modo México</span>
+                  <span className="text-[9px] font-semibold text-muted-foreground bg-muted px-1.5 py-0.5 rounded-full">
+                    Solo MXN
+                  </span>
+                </div>
+                <span className="text-[10px] text-muted-foreground">Ingresos y gastos sin conversión</span>
+              </div>
+              <ArrowRight className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+            </div>
+          </Link>
+        </div>
       </div>
 
       {/* Últimos Movimientos */}
