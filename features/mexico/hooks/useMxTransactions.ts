@@ -60,6 +60,7 @@ export function useMxTransactions(monthKey?: string) {
 
   return {
     transactions,
+    allTransactions,
     totalIngresos,
     totalGastos,
     balance,

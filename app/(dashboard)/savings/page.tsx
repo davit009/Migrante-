@@ -16,11 +16,13 @@ import { InvestmentSimulatorCard } from '@/features/savings/components/Investmen
 import { CategoryBudgetsSection } from '@/features/savings/components/CategoryBudgetsSection';
 import { useCategoryBudgets } from '@/features/savings/hooks/useCategoryBudgets';
 import { formatUSD, formatMXN } from '@/utils/currency.utils';
-import { formatDateShort, getTodayISO, getMonthKey, formatMonthLabel } from '@/utils/date.utils';
-import { calculateSuggestedBudget } from '@/utils/budget.utils';
+import { formatDateShort, getTodayISO, getMonthKey, formatMonthLabel, shiftMonthKey } from '@/utils/date.utils';
+import { calculateSuggestedBudget, classifyActualSpending } from '@/utils/budget.utils';
 import { groupExpensesByCategory } from '@/utils/category-spending.utils';
 import { getCategoryByValue } from '@/constants/categories';
 import { CategorySpendingBars } from '@/components/charts/CategorySpendingBars';
+import { BudgetVsActualCard } from '@/components/reports/BudgetVsActualCard';
+import { PeriodTrendCard } from '@/components/reports/PeriodTrendCard';
 
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -35,6 +37,7 @@ export default function SavingsPage() {
   const { rate } = useExchangeRate();
   const {
     transactions,
+    allTransactions,
     totalIngresosUSD,
     totalGastosUSD,
     balanceUSD,
@@ -44,6 +47,15 @@ export default function SavingsPage() {
     isSubmitting,
     isLoading
   } = useSavings(selectedMonth);
+
+  const previousMonth = shiftMonthKey(selectedMonth, -1);
+  const previousTransactions = allTransactions.filter((t) => t.fecha.startsWith(previousMonth));
+  const previousIngresosUSD = previousTransactions
+    .filter((t) => t.tipo === 'ingreso')
+    .reduce((sum, t) => sum + (t.moneda === 'USD' ? t.monto : (t.monto_mxn ?? t.monto) / (t.tipo_cambio || rate || 1)), 0);
+  const previousGastosUSD = previousTransactions
+    .filter((t) => t.tipo === 'gasto')
+    .reduce((sum, t) => sum + (t.moneda === 'USD' ? t.monto : (t.monto_mxn ?? t.monto) / (t.tipo_cambio || rate || 1)), 0);
 
   const {
     goals,
@@ -71,6 +83,8 @@ export default function SavingsPage() {
   });
 
   const categorySpending = groupExpensesByCategory(transactions, rate || 17.5);
+  const suggestedBudget = calculateSuggestedBudget(totalIngresosUSD);
+  const actualSpending = classifyActualSpending(transactions, rate || 17.5);
 
   const handleRegisterSuggestedSavings = async () => {
     const { ahorro } = calculateSuggestedBudget(totalIngresosUSD);
@@ -144,9 +158,12 @@ export default function SavingsPage() {
       </div>
 
       <Tabs defaultValue="movimientos" className="space-y-6">
-        <TabsList className="grid grid-cols-2 w-full max-w-sm h-11 rounded-2xl bg-muted p-1">
+        <TabsList className="grid grid-cols-3 w-full max-w-md h-11 rounded-2xl bg-muted p-1">
           <TabsTrigger value="movimientos" className="rounded-xl font-semibold text-xs sm:text-sm">
             Movimientos
+          </TabsTrigger>
+          <TabsTrigger value="resumen" className="rounded-xl font-semibold text-xs sm:text-sm">
+            Resumen
           </TabsTrigger>
           <TabsTrigger value="herramientas" className="rounded-xl font-semibold text-xs sm:text-sm">
             Metas y Presupuesto
@@ -155,23 +172,6 @@ export default function SavingsPage() {
 
         {/* Movimientos: lo esencial, visible siempre */}
         <TabsContent value="movimientos" className="space-y-6">
-          {categorySpending.length > 0 && (
-            <Card className="p-5 rounded-3xl border-border bg-card space-y-4">
-              <div>
-                <h3 className="font-bold text-sm text-foreground flex items-center gap-2">
-                  <ChartNoAxesColumnIncreasing className="w-4 h-4 text-primary" /> Gastos por Categoría
-                </h3>
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  En qué se te fue el dinero este mes, de mayor a menor.
-                </p>
-              </div>
-              <CategorySpendingBars
-                items={categorySpending.map((c) => ({ categoria: c.categoria, amount: c.totalUSD }))}
-                formatAmount={formatUSD}
-              />
-            </Card>
-          )}
-
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             {/* Columna Izquierda: Formulario (5 Cols) */}
             <div className="lg:col-span-5">
@@ -266,6 +266,44 @@ export default function SavingsPage() {
               )}
             </div>
           </div>
+        </TabsContent>
+
+        {/* Resumen: reporte del periodo — sugerido vs real, tendencia y categorías */}
+        <TabsContent value="resumen" className="space-y-6">
+          <BudgetVsActualCard
+            suggested={suggestedBudget}
+            actual={actualSpending}
+            formatAmount={formatUSD}
+            periodLabel={formatMonthLabel(selectedMonth)}
+          />
+
+          <PeriodTrendCard
+            currentLabel={formatMonthLabel(selectedMonth)}
+            previousLabel={formatMonthLabel(previousMonth)}
+            formatAmount={formatUSD}
+            rows={[
+              { label: 'Ingresos', current: totalIngresosUSD, previous: previousIngresosUSD },
+              { label: 'Gastos', current: totalGastosUSD, previous: previousGastosUSD, invert: true },
+              { label: 'Ahorro neto', current: balanceUSD, previous: previousIngresosUSD - previousGastosUSD },
+            ]}
+          />
+
+          {categorySpending.length > 0 && (
+            <Card className="p-5 rounded-3xl border-border bg-card space-y-4">
+              <div>
+                <h3 className="font-bold text-sm text-foreground flex items-center gap-2">
+                  <ChartNoAxesColumnIncreasing className="w-4 h-4 text-primary" /> Gastos por Categoría
+                </h3>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  En qué se te fue el dinero este mes, de mayor a menor.
+                </p>
+              </div>
+              <CategorySpendingBars
+                items={categorySpending.map((c) => ({ categoria: c.categoria, amount: c.totalUSD }))}
+                formatAmount={formatUSD}
+              />
+            </Card>
+          )}
         </TabsContent>
 
         {/* Herramientas: plan sugerido, metas, inversión y presupuestos — opcional para quien quiera profundizar */}

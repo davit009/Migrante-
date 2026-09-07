@@ -25,7 +25,7 @@ export async function GET() {
   if (error) {
     console.error('[keep-alive] Error:', error);
     return NextResponse.json(
-      { status: 'error', message: error.message },
+      { status: 'error' },
       { status: 503 }
     );
   }
