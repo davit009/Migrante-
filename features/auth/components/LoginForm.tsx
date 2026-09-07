@@ -8,7 +8,7 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
 
 import { loginSchema, type LoginFormValues } from '@/validators/auth.schema';
@@ -23,6 +23,8 @@ export function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
   const { loginWithEmail } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const next = searchParams.get('next') || '/dashboard';
 
   const {
     register,
@@ -41,7 +43,7 @@ export function LoginForm() {
       setIsLoading(true);
       await loginWithEmail(values);
       toast.success('¡Bienvenido de nuevo!');
-      router.push('/dashboard');
+      router.push(next);
       router.refresh();
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Error al iniciar sesión');
@@ -105,7 +107,7 @@ export function LoginForm() {
         <div className="flex-1 h-px bg-border/50" />
       </div>
 
-      <GoogleButton />
+      <GoogleButton next={next} />
     </div>
   );
 }

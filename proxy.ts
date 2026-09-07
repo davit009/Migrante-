@@ -1,16 +1,27 @@
 // ============================================================
 // proxy.ts
 // Proxy de Next.js 16 — Configuración de rutas públicas y privadas
+//
+// Combina la lógica de auth-redirect de Migrante$ y de Saldo
+// Transporte (app/transporte/*), namespaced por prefijo de ruta.
+// Next.js solo permite un middleware por app, así que ambas apps
+// comparten este archivo aunque tengan su propio conjunto de rutas
+// públicas/privadas. La sesión de Supabase es la misma para las dos
+// (mismo proyecto, auth compartida).
 // ============================================================
 
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
-// Rutas públicas (accesibles sin registro/login)
+// Rutas públicas de Migrante$ (accesibles sin registro/login)
 const PUBLIC_ROUTES = ['/', '/login', '/register', '/converter', '/calculator', '/remesas', '/rapido'];
 
-// Rutas públicas de API
+// Rutas públicas de API de Migrante$
 const PUBLIC_API_ROUTES = ['/api/exchange-rate', '/api/keep-alive', '/api/auth/callback', '/api/investment-rates'];
+
+// Saldo Transporte no tiene login propio — usa el mismo /login de
+// Migrante$ (misma cuenta, misma sesión), así que todo /transporte/*
+// requiere sesión activa.
 
 export async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
@@ -47,6 +58,20 @@ export async function proxy(request: NextRequest) {
     return supabaseResponse;
   }
 
+  // ── Saldo Transporte (app/transporte/*) ──────────────────────
+  if (pathname === '/transporte' || pathname.startsWith('/transporte/')) {
+    if (!user) {
+      const loginUrl = request.nextUrl.clone();
+      loginUrl.pathname = '/login';
+      loginUrl.search = '';
+      loginUrl.searchParams.set('next', pathname);
+      return NextResponse.redirect(loginUrl);
+    }
+
+    return supabaseResponse;
+  }
+
+  // ── Migrante$ ──────────────────────────────────────────────
   // Usuario NO autenticado intentando acceder a una ruta protegida
   if (!user && !PUBLIC_ROUTES.includes(pathname)) {
     const loginUrl = request.nextUrl.clone();

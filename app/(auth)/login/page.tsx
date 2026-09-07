@@ -5,6 +5,7 @@
 
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { Suspense } from 'react';
 import { LoginForm } from '@/features/auth/components/LoginForm';
 
 export const metadata: Metadata = {
@@ -30,7 +31,9 @@ export default function LoginPage() {
 
       {/* Glass Card del formulario */}
       <div className="w-full max-w-sm glass-strong rounded-3xl p-6 space-y-5 enter-up" style={{ animationDelay: '80ms' }}>
-        <LoginForm />
+        <Suspense fallback={null}>
+          <LoginForm />
+        </Suspense>
       </div>
 
       {/* Link a Registro */}
