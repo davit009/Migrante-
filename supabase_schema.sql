@@ -322,3 +322,27 @@ CREATE TRIGGER update_payroll_entries_updated_at
   BEFORE UPDATE ON public.migrante_payroll_entries
   FOR EACH ROW
   EXECUTE PROCEDURE migrante_update_updated_at_column();
+
+
+-- 11. TABLA: migrante_mx_transactions (Modo México — ledger separado, solo MXN, sin conversión)
+CREATE TABLE IF NOT EXISTS public.migrante_mx_transactions (
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id     UUID NOT NULL REFERENCES public.migrante_profiles(id) ON DELETE CASCADE,
+  tipo        TEXT NOT NULL CHECK (tipo IN ('ingreso', 'gasto')),
+  categoria   TEXT NOT NULL,
+  descripcion TEXT,
+  monto       NUMERIC(12, 2) NOT NULL CHECK (monto > 0),
+  fecha       DATE NOT NULL DEFAULT CURRENT_DATE,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_migrante_mx_transactions_user_id ON public.migrante_mx_transactions(user_id);
+CREATE INDEX IF NOT EXISTS idx_migrante_mx_transactions_fecha ON public.migrante_mx_transactions(fecha DESC);
+
+-- RLS para migrante_mx_transactions
+ALTER TABLE public.migrante_mx_transactions ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Los usuarios administran sus movimientos de modo México" ON public.migrante_mx_transactions;
+CREATE POLICY "Los usuarios administran sus movimientos de modo México"
+  ON public.migrante_mx_transactions FOR ALL
+  USING (auth.uid() = user_id);
