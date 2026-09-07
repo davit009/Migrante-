@@ -14,6 +14,11 @@ export function formatFecha(fechaIso: string) {
   return new Intl.DateTimeFormat('es-MX', {
     dateStyle: 'medium',
     timeStyle: 'short',
+    // Estas páginas son Server Components: sin timeZone explícito, el
+    // formato usa la hora del servidor (UTC en Vercel), no la del
+    // usuario — mostraba la hora ~6h adelantada. Misma zona que ya
+    // asume transporte_procesar_descuentos() en la base de datos.
+    timeZone: 'America/Mexico_City',
   }).format(new Date(fechaIso));
 }
 
