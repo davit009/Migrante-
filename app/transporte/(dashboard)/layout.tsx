@@ -9,7 +9,7 @@ export default async function TransporteDashboardLayout({ children }: { children
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect('/transporte/login');
+    redirect('/login?next=/transporte/dashboard');
   }
 
   // Asegura que exista una fila de configuración para el usuario.

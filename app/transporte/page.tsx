@@ -1,11 +1,7 @@
 import { redirect } from 'next/navigation';
-import { createClient } from '@/lib/supabase/server';
 
-export default async function TransporteHomePage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  redirect(user ? '/transporte/dashboard' : '/transporte/login');
+export default function TransporteHomePage() {
+  // proxy.ts ya garantiza que solo se llega aquí con sesión activa
+  // (Saldo Transporte no tiene login propio, usa el de Migrante$).
+  redirect('/transporte/dashboard');
 }

@@ -10,14 +10,18 @@ import { Button } from '@/components/ui/button';
 import { useAuth } from '../hooks/useAuth';
 import { toast } from 'sonner';
 
-export function GoogleButton() {
+interface GoogleButtonProps {
+  next?: string;
+}
+
+export function GoogleButton({ next }: GoogleButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
   const { loginWithGoogle } = useAuth();
 
   const handleGoogleLogin = async () => {
     try {
       setIsLoading(true);
-      await loginWithGoogle();
+      await loginWithGoogle(next);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Error al conectar con Google');
       setIsLoading(false);

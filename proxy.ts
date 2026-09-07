@@ -19,8 +19,9 @@ const PUBLIC_ROUTES = ['/', '/login', '/register', '/converter', '/calculator', 
 // Rutas públicas de API de Migrante$
 const PUBLIC_API_ROUTES = ['/api/exchange-rate', '/api/keep-alive', '/api/auth/callback', '/api/investment-rates'];
 
-// Rutas públicas de Saldo Transporte (app separada, misma auth)
-const TRANSPORTE_PUBLIC_ROUTES = ['/transporte', '/transporte/login', '/transporte/register'];
+// Saldo Transporte no tiene login propio — usa el mismo /login de
+// Migrante$ (misma cuenta, misma sesión), así que todo /transporte/*
+// requiere sesión activa.
 
 export async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
@@ -59,16 +60,12 @@ export async function proxy(request: NextRequest) {
 
   // ── Saldo Transporte (app/transporte/*) ──────────────────────
   if (pathname === '/transporte' || pathname.startsWith('/transporte/')) {
-    if (!user && !TRANSPORTE_PUBLIC_ROUTES.includes(pathname)) {
+    if (!user) {
       const loginUrl = request.nextUrl.clone();
-      loginUrl.pathname = '/transporte/login';
+      loginUrl.pathname = '/login';
+      loginUrl.search = '';
+      loginUrl.searchParams.set('next', pathname);
       return NextResponse.redirect(loginUrl);
-    }
-
-    if (user && (pathname === '/transporte/login' || pathname === '/transporte/register')) {
-      const dashboardUrl = request.nextUrl.clone();
-      dashboardUrl.pathname = '/transporte/dashboard';
-      return NextResponse.redirect(dashboardUrl);
     }
 
     return supabaseResponse;

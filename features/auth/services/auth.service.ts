@@ -54,9 +54,11 @@ export const authService = {
   /**
    * Inicia flujo OAuth con Google.
    */
-  async loginWithGoogle() {
+  async loginWithGoogle(next?: string) {
     const supabase = createClient();
-    const redirectTo = `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/callback`;
+    const redirectTo = next
+      ? `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/callback?next=${encodeURIComponent(next)}`
+      : `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/callback`;
 
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
