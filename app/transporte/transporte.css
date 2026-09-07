@@ -1,0 +1,45 @@
+/* ============================================================
+   app/transporte/transporte.css
+   Tokens de color de "Saldo Transporte", deliberadamente aislados
+   de los de Migrante$ (variables con prefijo --tp-, y todo el
+   subárbol /transporte usa clases bg-[var(--tp-*)] en vez de los
+   tokens compartidos bg-primary/bg-destructive/etc. de Migrante$).
+   Así ningún cambio de paleta de una app afecta a la otra.
+   ============================================================ */
+
+.tp-scope {
+  --tp-background: #f5f7fb;
+  --tp-foreground: #101828;
+  --tp-card: #ffffff;
+  --tp-card-foreground: #101828;
+  --tp-border: #e2e5ec;
+  --tp-muted: #eef1f6;
+  --tp-muted-foreground: #667085;
+  --tp-primary: #2f6fed;
+  --tp-primary-foreground: #ffffff;
+  --tp-destructive: #d92d20;
+  --tp-success: #12805c;
+}
+
+.dark .tp-scope {
+  --tp-background: #0b1220;
+  --tp-foreground: #eef1f6;
+  --tp-card: #121a2b;
+  --tp-card-foreground: #eef1f6;
+  --tp-border: #24304a;
+  --tp-muted: #16203380;
+  --tp-muted-foreground: #9aa4b8;
+  --tp-primary: #6d9bff;
+  --tp-primary-foreground: #0b1220;
+  --tp-destructive: #f97066;
+  --tp-success: #3dd598;
+}
+
+.tp-scope {
+  background: var(--tp-background);
+  color: var(--tp-foreground);
+}
+
+.tp-scope * {
+  border-color: var(--tp-border);
+}
