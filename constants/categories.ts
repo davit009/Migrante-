@@ -49,3 +49,16 @@ export const EXPENSE_CATEGORIES = CATEGORIES.filter(
 
 export const getCategoryByValue = (value: string): Category | undefined =>
   CATEGORIES.find((c) => c.value === value);
+
+/**
+ * Filtra una lista de categorías a solo las que el usuario activó en
+ * "Mis categorías" (Configuración). Si `activas` viene vacío o sin
+ * definir, no se muestra ninguna — el usuario arma su lista desde cero.
+ */
+export const filterActiveCategories = (
+  categories: Category[],
+  activas: string[] | null | undefined
+): Category[] => {
+  const active = new Set(activas ?? []);
+  return categories.filter((c) => active.has(c.value));
+};

@@ -29,15 +29,29 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- 2. TABLA: migrante_profiles (Perfil de usuario extendido de auth.users)
 CREATE TABLE IF NOT EXISTS public.migrante_profiles (
-  id          UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
-  nombre      TEXT NOT NULL,
-  pais        TEXT NOT NULL DEFAULT 'MX',
-  estado_usa  TEXT,                           -- Ej: 'TX', 'CA', 'FL'
-  moneda_pref TEXT NOT NULL DEFAULT 'USD',   -- 'USD' o 'MXN'
-  avatar_url  TEXT,
-  created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  id                 UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  nombre             TEXT NOT NULL,
+  pais               TEXT NOT NULL DEFAULT 'MX',
+  estado_usa         TEXT,                           -- Ej: 'TX', 'CA', 'FL'
+  moneda_pref        TEXT NOT NULL DEFAULT 'USD',   -- 'USD' o 'MXN'
+  avatar_url         TEXT,
+  categorias_activas TEXT[] NOT NULL DEFAULT '{comida,renta,telefono}',  -- Categorías que el usuario eligió usar (ver constants/categories.ts)
+  created_at         TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at         TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+-- Por si la tabla ya existía de una corrida anterior de este script (antes
+-- de que existiera "Mis categorías")
+ALTER TABLE public.migrante_profiles ADD COLUMN IF NOT EXISTS categorias_activas TEXT[] NOT NULL DEFAULT '{comida,renta,telefono}';
+
+-- ADD COLUMN IF NOT EXISTS no toca el DEFAULT si la columna ya existía de
+-- una corrida anterior (cuando el default era '{}') — este ALTER sí lo
+-- actualiza, para que los perfiles nuevos arranquen con las 3 sugeridas.
+ALTER TABLE public.migrante_profiles ALTER COLUMN categorias_activas SET DEFAULT '{comida,renta,telefono}';
+
+-- (El backfill de categorias_activas para perfiles existentes va hasta el
+-- final del script — sección 12 — porque necesita que migrante_transactions
+-- y migrante_mx_transactions ya existan.)
 
 -- RLS para migrante_profiles
 ALTER TABLE public.migrante_profiles ENABLE ROW LEVEL SECURITY;
@@ -346,3 +360,30 @@ DROP POLICY IF EXISTS "Los usuarios administran sus movimientos de modo México"
 CREATE POLICY "Los usuarios administran sus movimientos de modo México"
   ON public.migrante_mx_transactions FOR ALL
   USING (auth.uid() = user_id);
+
+
+-- 12. BACKFILL: categorias_activas para perfiles que ya tenían movimientos
+-- Ver columna agregada en la sección 2 (migrante_profiles). A los perfiles
+-- que ya usaban la app antes de que existiera "Mis categorías" se les
+-- activan las categorías que ya venían usando, para que no se queden sin
+-- poder registrar nada. Seguro de volver a correr: solo toca perfiles que
+-- sigan en '{}'.
+UPDATE public.migrante_profiles p
+SET categorias_activas = sub.categorias
+FROM (
+  SELECT user_id, ARRAY_AGG(DISTINCT categoria) AS categorias
+  FROM (
+    SELECT user_id, categoria FROM public.migrante_transactions
+    UNION
+    SELECT user_id, categoria FROM public.migrante_mx_transactions
+  ) t
+  GROUP BY user_id
+) sub
+WHERE p.id = sub.user_id
+  AND p.categorias_activas = '{}';
+
+-- A quien siga en '{}' después de lo anterior (perfil sin movimientos
+-- todavía) se le da el mismo punto de partida que a un usuario nuevo.
+UPDATE public.migrante_profiles
+SET categorias_activas = '{comida,renta,telefono}'
+WHERE categorias_activas = '{}';

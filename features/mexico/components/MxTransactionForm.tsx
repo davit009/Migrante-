@@ -7,8 +7,10 @@
 // ============================================================
 
 import { useState } from 'react';
-import { CATEGORIES } from '@/constants/categories';
+import Link from 'next/link';
+import { CATEGORIES, filterActiveCategories } from '@/constants/categories';
 import { getTodayISO } from '@/utils/date.utils';
+import { useAuth } from '@/features/auth/hooks/useAuth';
 import type { MxTransactionCreate, TransactionType, TransactionCategory } from '@/types/app.types';
 
 import { Card } from '@/components/ui/card';
@@ -16,7 +18,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus } from 'lucide-react';
+import { ListChecks, Plus } from 'lucide-react';
 
 interface MxTransactionFormProps {
   onSubmit: (values: MxTransactionCreate) => Promise<unknown>;
@@ -24,27 +26,35 @@ interface MxTransactionFormProps {
 }
 
 export function MxTransactionForm({ onSubmit, isSubmitting }: MxTransactionFormProps) {
+  const { profile } = useAuth();
   const [tipo, setTipo] = useState<TransactionType>('gasto');
-  const [categoria, setCategoria] = useState<TransactionCategory>('supermercado');
+  const [categoria, setCategoria] = useState<TransactionCategory | ''>('');
   const [descripcion, setDescripcion] = useState('');
   const [monto, setMonto] = useState('');
   const [fecha, setFecha] = useState(getTodayISO());
 
-  const availableCategories = CATEGORIES.filter((c) => c.tipo === tipo || c.tipo === 'ambos');
+  const categoriesForTipo = CATEGORIES.filter((c) => c.tipo === tipo || c.tipo === 'ambos');
+  const availableCategories = filterActiveCategories(categoriesForTipo, profile?.categorias_activas);
+
+  // Si la categoría guardada en el estado ya no aplica (cambió el tipo, o
+  // el perfil recién cargó), se deriva la primera categoría activa
+  // disponible en su lugar — sin efecto, para no disparar renders en cadena.
+  const categoriaValue: TransactionCategory | '' = availableCategories.some((c) => c.value === categoria)
+    ? categoria
+    : ((availableCategories[0]?.value as TransactionCategory) ?? '');
 
   const handleTipoChange = (nuevoTipo: TransactionType) => {
     setTipo(nuevoTipo);
-    setCategoria(nuevoTipo === 'ingreso' ? 'trabajo' : 'supermercado');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const montoNum = parseFloat(monto);
-    if (isNaN(montoNum) || montoNum <= 0) return;
+    if (isNaN(montoNum) || montoNum <= 0 || !categoriaValue) return;
 
     await onSubmit({
       tipo,
-      categoria,
+      categoria: categoriaValue,
       descripcion: descripcion || undefined,
       monto: montoNum,
       fecha,
@@ -96,9 +106,21 @@ export function MxTransactionForm({ onSubmit, isSubmitting }: MxTransactionFormP
           />
         </div>
 
+        {availableCategories.length === 0 ? (
+          <div className="rounded-xl border border-dashed border-border bg-muted/40 p-3 flex items-start gap-2">
+            <ListChecks className="w-4 h-4 text-muted-foreground shrink-0 mt-0.5" />
+            <p className="text-xs text-muted-foreground">
+              Aún no activas categorías de {tipo === 'ingreso' ? 'ingreso' : 'gasto'}.{' '}
+              <Link href="/settings" className="text-primary font-semibold hover:underline">
+                Actívalas en Configuración
+              </Link>
+              .
+            </p>
+          </div>
+        ) : (
         <div className="space-y-1">
           <Label htmlFor="mx-cat" className="text-xs">Categoría</Label>
-          <Select value={categoria} onValueChange={(val) => val && setCategoria(val as TransactionCategory)}>
+          <Select value={categoriaValue} onValueChange={(val) => val && setCategoria(val as TransactionCategory)}>
             <SelectTrigger id="mx-cat" className="h-11 rounded-xl">
               <SelectValue placeholder="Selecciona categoría..." />
             </SelectTrigger>
@@ -112,6 +134,7 @@ export function MxTransactionForm({ onSubmit, isSubmitting }: MxTransactionFormP
             </SelectContent>
           </Select>
         </div>
+        )}
 
         <div className="space-y-1">
           <Label htmlFor="mx-desc" className="text-xs">Descripción (opcional)</Label>
@@ -137,7 +160,7 @@ export function MxTransactionForm({ onSubmit, isSubmitting }: MxTransactionFormP
 
         <Button
           type="submit"
-          disabled={isSubmitting}
+          disabled={isSubmitting || availableCategories.length === 0}
           className={`w-full h-11 rounded-2xl font-semibold text-white gap-2 shadow-sm ${
             tipo === 'ingreso' ? 'bg-success hover:bg-success/90' : 'bg-destructive hover:bg-destructive/90'
           }`}

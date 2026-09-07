@@ -9,6 +9,7 @@ import { useState } from 'react';
 import { useAuth } from '@/features/auth/hooks/useAuth';
 import { profilesService } from '@/services/profiles.service';
 import { USA_STATES_LIST } from '@/constants/usa-states';
+import { CategoryPreferences } from '@/features/settings/components/CategoryPreferences';
 
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -133,6 +134,14 @@ export default function SettingsPage() {
           </Button>
         </form>
       </Card>
+
+      {user && (
+        <CategoryPreferences
+          userId={user.id}
+          categoriasActivas={profile?.categorias_activas ?? []}
+          onSaved={refreshProfile}
+        />
+      )}
     </div>
   );
 }
