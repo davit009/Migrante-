@@ -5,12 +5,14 @@
 // Formulario modal/card para crear Ingresos o Gastos
 // ============================================================
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import Link from 'next/link';
 import { transactionStringSchema } from '@/validators/transaction.schema';
-import { CATEGORIES } from '@/constants/categories';
+import { CATEGORIES, filterActiveCategories } from '@/constants/categories';
 import { getTodayISO } from '@/utils/date.utils';
+import { useAuth } from '@/features/auth/hooks/useAuth';
 import type { TransactionCreate, TransactionCategory } from '@/types/app.types';
 
 import { Card } from '@/components/ui/card';
@@ -18,7 +20,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus } from 'lucide-react';
+import { ListChecks, Plus } from 'lucide-react';
 
 interface TransactionFormProps {
   onSubmit: (values: TransactionCreate) => Promise<any>;
@@ -27,11 +29,13 @@ interface TransactionFormProps {
 
 export function TransactionForm({ onSubmit, isSubmitting }: TransactionFormProps) {
   const [tipo, setTipo] = useState<'ingreso' | 'gasto'>('gasto');
+  const { profile } = useAuth();
 
   const {
     register,
     handleSubmit,
     setValue,
+    getValues,
     watch,
     reset,
     formState: { errors },
@@ -39,7 +43,7 @@ export function TransactionForm({ onSubmit, isSubmitting }: TransactionFormProps
     resolver: zodResolver(transactionStringSchema),
     defaultValues: {
       tipo: 'gasto',
-      categoria: 'supermercado',
+      categoria: '',
       descripcion: '',
       monto: '',
       moneda: 'USD',
@@ -47,9 +51,18 @@ export function TransactionForm({ onSubmit, isSubmitting }: TransactionFormProps
     },
   });
 
-  const availableCategories = CATEGORIES.filter(
-    (c) => c.tipo === tipo || c.tipo === 'ambos'
-  );
+  const categoriesForTipo = CATEGORIES.filter((c) => c.tipo === tipo || c.tipo === 'ambos');
+  const availableCategories = filterActiveCategories(categoriesForTipo, profile?.categorias_activas);
+
+  // Si la categoría seleccionada ya no aplica (cambió el tipo, o el perfil
+  // recién cargó), recae en la primera categoría activa disponible.
+  useEffect(() => {
+    const current = getValues('categoria');
+    if (!availableCategories.some((c) => c.value === current)) {
+      setValue('categoria', availableCategories[0]?.value ?? '');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tipo, availableCategories.map((c) => c.value).join(',')]);
 
   const handleFormSubmit = async (data: any) => {
     await onSubmit({
@@ -64,7 +77,7 @@ export function TransactionForm({ onSubmit, isSubmitting }: TransactionFormProps
   };
 
   const monedaValue = watch('moneda') || 'USD';
-  const categoriaValue = watch('categoria') || availableCategories[0]?.value || 'supermercado';
+  const categoriaValue = watch('categoria') || availableCategories[0]?.value || '';
 
   return (
     <Card className="p-5 rounded-3xl border-border bg-card shadow-sm space-y-4">
@@ -78,7 +91,6 @@ export function TransactionForm({ onSubmit, isSubmitting }: TransactionFormProps
             onClick={() => {
               setTipo('gasto');
               setValue('tipo', 'gasto');
-              setValue('categoria', 'supermercado');
             }}
             className={`px-3 py-1 text-xs font-semibold rounded-lg transition-all ${
               tipo === 'gasto'
@@ -93,7 +105,6 @@ export function TransactionForm({ onSubmit, isSubmitting }: TransactionFormProps
             onClick={() => {
               setTipo('ingreso');
               setValue('tipo', 'ingreso');
-              setValue('categoria', 'trabajo');
             }}
             className={`px-3 py-1 text-xs font-semibold rounded-lg transition-all ${
               tipo === 'ingreso'
@@ -139,6 +150,18 @@ export function TransactionForm({ onSubmit, isSubmitting }: TransactionFormProps
         </div>
 
         {/* Categoría */}
+        {availableCategories.length === 0 ? (
+          <div className="rounded-xl border border-dashed border-border bg-muted/40 p-3 flex items-start gap-2">
+            <ListChecks className="w-4 h-4 text-muted-foreground shrink-0 mt-0.5" />
+            <p className="text-xs text-muted-foreground">
+              Aún no activas categorías de {tipo === 'ingreso' ? 'ingreso' : 'gasto'}.{' '}
+              <Link href="/settings" className="text-primary font-semibold hover:underline">
+                Actívalas en Configuración
+              </Link>
+              .
+            </p>
+          </div>
+        ) : (
         <div className="space-y-1">
           <Label htmlFor="tx-cat" className="text-xs">Categoría</Label>
           <Select
@@ -158,6 +181,7 @@ export function TransactionForm({ onSubmit, isSubmitting }: TransactionFormProps
             </SelectContent>
           </Select>
         </div>
+        )}
 
         {/* Descripción */}
         <div className="space-y-1">
@@ -184,7 +208,7 @@ export function TransactionForm({ onSubmit, isSubmitting }: TransactionFormProps
         {/* Submit Button */}
         <Button
           type="submit"
-          disabled={isSubmitting}
+          disabled={isSubmitting || availableCategories.length === 0}
           className={`w-full h-11 rounded-2xl font-semibold text-white gap-2 shadow-sm ${
             tipo === 'ingreso' ? 'bg-success hover:bg-success/90' : 'bg-destructive hover:bg-destructive/90'
           }`}

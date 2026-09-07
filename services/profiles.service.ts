@@ -45,4 +45,24 @@ export const profilesService = {
 
     return data as UserProfile;
   },
+
+  /**
+   * Actualiza la lista de categorías que el usuario eligió activar
+   * (ver features/settings/components/CategoryPreferences.tsx).
+   */
+  async updateActiveCategories(userId: string, categorias: string[]): Promise<UserProfile> {
+    const supabase = createClient();
+    const { data, error } = await supabase
+      .from('migrante_profiles')
+      .update({ categorias_activas: categorias })
+      .eq('id', userId)
+      .select()
+      .single();
+
+    if (error) {
+      throw new Error(`Error al guardar tus categorías: ${error.message}`);
+    }
+
+    return data as UserProfile;
+  },
 };
