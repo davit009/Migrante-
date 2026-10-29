@@ -11,6 +11,7 @@ export interface UserProfile {
   estado_usa: string | null;
   moneda_pref: 'USD' | 'MXN';
   avatar_url: string | null;
+  categorias_activas: string[];
   created_at: string;
   updated_at: string;
 }
